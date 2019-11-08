@@ -13,4 +13,15 @@ Run Instructions:
  popup–assuming xquartz is installed. The windows can be switched in the xquartz viewer by tying 'f' for forwarding
  or 'b' for backward.
 
- The code is still being developed and more instructions will be added to further explain it. 
+Plotting.py
+-Plotting takes the trajectory file and reorganizes it into a cleaned file. This
+file makes it easier to load the data into a pandas dataframe from which the plotting is done.
+
+Loader_Func.py
+-This function is still in development. The goal is for this function to take in
+parameters such as particle energy, type of particle, and distribution desired (Gaussian,
+ellipsoid, etc.) and then populate a beam with the created particles.
+
+
+
+The ORISS code is still being developed and more instructions will be added to further explain it.

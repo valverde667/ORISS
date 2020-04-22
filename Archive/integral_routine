@@ -1,0 +1,18 @@
+#Integral routine
+
+#--Get Derivatives
+phi = getphi(ix=0)
+#--Filter to find where denominator becomes imaginary
+term = uranium_beam.charge*phi/(particle_energy*jperev)
+for i in range(len(term)):
+  if term[i] > 1:
+    index = i
+    break
+  else:
+    continue
+phi = phi[:index-1]
+dphi = np.gradient(phi)
+ddphi = np.gradient(dphi)
+
+#--Get Integrand
+coeff = -uranium_beam.charge/(particle_energy*jperev)

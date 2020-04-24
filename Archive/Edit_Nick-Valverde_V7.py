@@ -221,8 +221,8 @@ load_list = []
 particle_energy = 2.77*kV #2.77 kV is good for both point-point and ||-point
 #velocity = 47388.2515713436 m/s
 #--Point to point load
-particle_energy_range = particle_energy*np.array([.997, .998, .999, 1.000, 1.001, 1.002, 1.003])
-#particle_energy_range = particle_energy*np.array([1., 1., 1., 1., 1., 1., 1.])
+#particle_energy_range = particle_energy*np.array([.997, .998, .999, 1.000, 1.001, 1.002, 1.003])
+particle_energy_range = particle_energy*np.array([1., 1., 1., 1., 1., 1., 1.])
 
 #--Parallel to point load
 x_list = np.array([i*.001 for i in range(-4, 4 + 1)])
@@ -232,16 +232,16 @@ for energy in particle_energy_range:
     Np = 10
     while counter < Np:
         p = MyParticle(energy,uranium_beam)
-        load = p.loader('gaussian', avg_coordinates = (0, 0, 0), sigma = (4*mm, 0, 0))
+        load = p.loader('gaussian', avg_coordinates = (0, 0, 0), sigma = (1*mm, 0, 0))
         load_xpos = load[0][0]
-        if abs(load_xpos) > 6*mm:
+        if abs(load_xpos) > 1*mm:
             pass
         elif abs(load_xpos) < 1*mm:
             pass
         else:
             load_list.append(load)
             counter += 1
-  
+
 for array in load_list:
     load = array[0]
     xpos, ypos, zpos = load[0], load[1], load[2]

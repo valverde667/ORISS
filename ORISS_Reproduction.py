@@ -1,7 +1,8 @@
 #First version with actual mass spectrometry
 #Using Uranium (238) and Neptunium (237)
-
+#IMPORTANT DO NOT NAME ANYTHING LOAD, this interrupts with a declared functionion Species.py
 from warp import *
+from warp.particles.singleparticle import TraceParticle
 from Forthon import *
 from Particle_Class import *
 from fill_ellipse import *
@@ -183,8 +184,12 @@ installconductor(zl8)
 ####################################################################
 # Particle Moving and Species
 ####################################################################
+target1 = ZCylinder(radius = 25*mm, length = 600*mm, zcent=0)
+target2 = ZCylinder(radius = 25*mm, length = -600*mm, zcent=0)
 
 top.dt     = 1e-7 # Timestep of particle advance
+desired_run_time = .001 #s
+run_time = desired_run_time/top.dt
 
 #Set particle boundary conditions at mesh ends
 top.pbound0 = absorb  #boundary condition at iz == 0
@@ -194,8 +199,6 @@ top.pboundxy = absorb #boundary condition at edge or radial mesh
 
 #Create Species of particles to advance
 uranium_beam = Species(type=Uranium,charge_state=+1,name="Beam species",weight=0) #weight = 0 no spacecharge, 1 = spacecharge. Both go through Poisson sovler.
-
-print("mass of uranium_beam is "+str(uranium_beam.sm));
 
 top.lbeamcom = False # Specify grid does not move to follow beam center of mass as appropriate for trap simulation
 
@@ -217,147 +220,171 @@ z = linspace(-1.,1.,w3d.nz+1)
 
 particle_energy = 2.77*kV #2.77 kV is good for both point-point and ||-point
 
-
-p = MyParticle(particle_energy, uranium_beam) #Create particle instance
-sigma_list = (1*mm, 1*mm, 5*mm)               #Standard deviations (sx, sy, sz)
-temp_list = (8.62e-5, 8.62e-5)                #[eV] corresponds to 1K
-pos_dist = 'uniform_ellipsoid'                #Distribution for position
+# load_list = []
+# p = MyParticle(particle_energy, uranium_beam) #Create particle instance
+# sigma_list = (1*mm, 1*mm, 5*mm)               #Standard deviations (sx, sy, sz)
+# temp_list = (8.62e-5, 8.62e-5)                #[eV] corresponds to 1K
+pos_dist = 'gaussian'                         #Distribution for position
 vel_dist = 'gaussian'                         #Distribution for velocity
-Np = 500                               #Number of particles
-load_list = p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
-                     num_of_particles = Np, sigma = sigma_list, temperature = temp_list)
+#load_list = p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
+#                     num_of_particles = Np, sigma = sigma_list, temperature = temp_list)
+
+# xbanana_list = np.arange(1,10,1)
+# p = MyParticle(particle_energy, uranium_beam) #Create particle instance
+# load_list = []
+# for elem in xbanana_list:
+#     load = p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
+#     avg_coordinates = (elem, 0, 0))
+#     load_list.append(load)
 
 
-    
-    
- # =============================================================================   
+
+
+ # =============================================================================
 #-- Create Distribution Plots
-
-xpos_list = []
-vx_list = []
-ypos_list = []
-vy_list =[]
-zpos_list = []
-vz_list = []
-
-for elem in load_list:
-    
-    xpos_list.append(elem[0])
-    vx_list.append(elem[3])
-
-    ypos_list.append(elem[1])
-    vy_list.append(elem[4])
-
-    zpos_list.append(elem[2])
-    vz_list.append(elem[5])
-
-xpos_list = np.array(xpos_list)
-ypos_list = np.array(ypos_list)
-zpos_list = np.array(zpos_list)
-
-vx_list = np.array(vx_list)
-vy_list = np.array(vy_list)
-vz_list = np.array(vz_list)
-
-rpos_list = np.sqrt(xpos_list**2 + ypos_list**2)
-
-
-filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/'
-plt.scatter(zpos_list/mm,xpos_list/mm, s = .5)
-plt.title('x-z', fontsize = 16)
-plt.xlabel("z[mm]", fontsize = 14)
-plt.ylabel("x[mm]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'x-z.png', dpi=300)
-plt.show()
-
-plt.scatter(zpos_list/mm,ypos_list/mm, s = .5)
-plt.title('y-z', fontsize = 16)
-plt.xlabel("z[mm]", fontsize = 14)
-plt.ylabel("y[mm]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'y-z.png', dpi=300)
-plt.show()
-
-plt.scatter(xpos_list/mm, ypos_list/mm, s = .5)
-plt.title('x-y', fontsize = 16)
-plt.xlabel("x[mm]", fontsize = 14)
-plt.ylabel("y[mm]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'y-x.png', dpi=300)
-plt.show()
-
-filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/'
-fig, ax = plt.subplots(figsize = (7,7))
-ax.scatter(zpos_list/mm, rpos_list/mm, c = 'b', s = .5)
-ax.scatter(zpos_list/mm, -rpos_list/mm,c = 'b', s = .5)
-ax.set_title('r-z', fontsize = 16)
-ax.set_xlabel("z[mm]", fontsize = 14)
-ax.set_ylabel("r[mm]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'r-z.png', dpi=300)
-plt.show()
-
-
-
-
-plt.scatter(xpos_list/mm, vx_list, s = .5)
-plt.title('vx-x', fontsize = 16)
-plt.xlabel("x [m]", fontsize = 14)
-plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'vx-x.png', dpi=300)
-plt.show()
-
-
-plt.scatter(ypos_list/mm, vy_list, s = .5)
-plt.title('vy-y', fontsize = 16)
-plt.xlabel("y[mm]", fontsize = 14)
-plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'vy-y.png', dpi=300)
-plt.show()
-
-
-plt.scatter(zpos_list/mm, vz_list, s = .5)
-plt.title('vz-z', fontsize = 16)
-plt.xlabel("z[mm]", fontsize = 14)
-plt.ylabel(r"$v_z$[m/s]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'vz-z.png', dpi=300)
-plt.show()
-
-
-plt.scatter(vz_list, vx_list, s = .5)
-plt.title('vx-vz', fontsize = 16)
-plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
-plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'vx-vz.png', dpi=300)
-plt.show()
-
-plt.scatter(vz_list, vy_list, s = .5)
-plt.title('vy-vz', fontsize = 16)
-plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
-plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'vy-vz.png', dpi=300)
-plt.show()
-
-plt.scatter(vx_list, vy_list, s = .5)
-plt.title('vy-vx', fontsize = 16)
-plt.xlabel(r"$v_x$[m/s]", fontsize = 14)
-plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
-plt.tight_layout()
-plt.savefig(filestring + 'vy-vx.png', dpi=300)
-plt.show()
+#
+# xpos_list = []
+# vx_list = []
+# ypos_list = []
+# vy_list =[]
+# zpos_list = []
+# vz_list = []
+#
+# for elem in load_list:
+#     xpos_list.append(elem[0])
+#     vx_list.append(elem[3])
+#
+#     ypos_list.append(elem[1])
+#     vy_list.append(elem[4])
+#
+#     zpos_list.append(elem[2])
+#     vz_list.append(elem[5])
+#
+# xpos_list = np.array(xpos_list)
+# ypos_list = np.array(ypos_list)
+# zpos_list = np.array(zpos_list)
+#
+# vx_list = np.array(vx_list)
+# vy_list = np.array(vy_list)
+# vz_list = np.array(vz_list)
+#
+# rpos_list = np.sqrt(xpos_list**2 + ypos_list**2)
+#
+#
+# filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/'
+# plt.scatter(zpos_list/mm,xpos_list/mm, s = .5)
+# plt.title('x-z', fontsize = 16)
+# plt.xlabel("z[mm]", fontsize = 14)
+# plt.ylabel("x[mm]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'x-z.png', dpi=300)
+# plt.show()
+#
+# plt.scatter(zpos_list/mm,ypos_list/mm, s = .5)
+# plt.title('y-z', fontsize = 16)
+# plt.xlabel("z[mm]", fontsize = 14)
+# plt.ylabel("y[mm]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'y-z.png', dpi=300)
+# plt.show()
+#
+# plt.scatter(xpos_list/mm, ypos_list/mm, s = .5)
+# plt.title('x-y', fontsize = 16)
+# plt.xlabel("x[mm]", fontsize = 14)
+# plt.ylabel("y[mm]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'y-x.png', dpi=300)
+# plt.show()
+#
+# filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/'
+# fig, ax = plt.subplots(figsize = (7,7))
+# ax.scatter(zpos_list/mm, rpos_list/mm, c = 'b', s = .5)
+# ax.scatter(zpos_list/mm, -rpos_list/mm,c = 'b', s = .5)
+# ax.set_title('r-z', fontsize = 16)
+# ax.set_xlabel("z[mm]", fontsize = 14)
+# ax.set_ylabel("r[mm]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'r-z.png', dpi=300)
+# plt.show()
+#
+#
+#
+#
+# plt.scatter(xpos_list/mm, vx_list, s = .5)
+# plt.title('vx-x', fontsize = 16)
+# plt.xlabel("x [m]", fontsize = 14)
+# plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'vx-x.png', dpi=300)
+# plt.show()
+#
+#
+# plt.scatter(ypos_list/mm, vy_list, s = .5)
+# plt.title('vy-y', fontsize = 16)
+# plt.xlabel("y[mm]", fontsize = 14)
+# plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'vy-y.png', dpi=300)
+# plt.show()
+#
+#
+# plt.scatter(zpos_list/mm, vz_list, s = .5)
+# plt.title('vz-z', fontsize = 16)
+# plt.xlabel("z[mm]", fontsize = 14)
+# plt.ylabel(r"$v_z$[m/s]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'vz-z.png', dpi=300)
+# plt.show()
+#
+#
+# plt.scatter(vz_list, vx_list, s = .5)
+# plt.title('vx-vz', fontsize = 16)
+# plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
+# plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'vx-vz.png', dpi=300)
+# plt.show()
+#
+# plt.scatter(vz_list, vy_list, s = .5)
+# plt.title('vy-vz', fontsize = 16)
+# plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
+# plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'vy-vz.png', dpi=300)
+# plt.show()
+#
+# plt.scatter(vx_list, vy_list, s = .5)
+# plt.title('vy-vx', fontsize = 16)
+# plt.xlabel(r"$v_x$[m/s]", fontsize = 14)
+# plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
+# plt.tight_layout()
+# plt.savefig(filestring + 'vy-vx.png', dpi=300)
+# plt.show()
 # =============================================================================
+ 
 
 #--Load particles onto beam
-for elem in load_list:
-    xpos, ypos, zpos = elem[0], elem[1], elem[2]
-    vx, vy, vz = elem[3], elem[4], elem[5] #1.178 to math V4 code
-    uranium_beam.addparticles(xpos, ypos, zpos, vx, vy, vz)
+xcoord = [i*mm for i in range(20)]
+load_list = []
+p = MyParticle(particle_energy, uranium_beam)
+
+for xpos in xcoord:
+    load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
+    avg_coordinates = (xpos, 0, 0)))
+
+
+for array in load_list:
+      elem = array[0]
+      xpos,ypos,zpos = elem[0], elem[1], elem[2]
+      vxpos, vypos, vzpos = elem[3], elem[4], elem[5]
+      
+      uranium_beam.addparticles(xpos,ypos,zpos,vxpos,vypos,vzpos)
+
+#Add tracer particle
+tracked_uranium =  Species(type=Uranium,charge_state=+1,name="Beam species",weight=0)
+tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_beam.mass))
+
+
 
 
 
@@ -418,6 +445,7 @@ species_ratio = 0.1  # put 1/10 in one species and 9/10 in other.
 
 #Create files
 trajectoryfile = open("trajectoryfile.txt","w")  # saves marker trajectories
+trackedfile = open("tracked_particle.txt", "w")
 poincarefile = open("poincarefile.txt","w")
 deltazfile = open("deltazfile.txt","w")
 stddevfile = open("stddevfile.txt","w")
@@ -429,23 +457,37 @@ for i in range(0,uranium_beam.getz().size):
     trajectoryfile.write('{},{},{},{},{},{}'.format(i, 0, top.pgroup.zp[i], top.pgroup.uzp[i], top.pgroup.xp[i], top.pgroup.uxp[i]) + "\n")
     trajectoryfile.flush()
 
+trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
+                                                     tracked_uranium.getx()[0], tracked_uranium.getvx()[0]) + "\n")
+trackedfile.flush()
+
 #Stdev File
-for iteration in range(1,2066*10):
-    stddevfile.write(str(numpy.mean(top.pgroup.zp))+" "+str(numpy.std(top.pgroup.zp))+" "+str(numpy.mean(top.pgroup.xp))+" "+str(numpy.std(top.pgroup.xp))+"\n")
+bounce_count = 0
+iteration = 0
+while bounce_count < 5:
+    stddevfile.write(str(np.mean(top.pgroup.zp))+" "+str(np.std(top.pgroup.zp))+" "+str(np.mean(top.pgroup.xp))+" "+str(np.std(top.pgroup.xp))+"\n")
     stddevfile.flush()
-
-
-
-
-
+    
+    print(top.pgroup.xp)
     step(1)  # advance particles
-    print(0.5*uranium_beam.mass*uranium_beam.getvz()**2/jperev)
-    print("beam velocity is: ", uranium_beam.getvz())
+    sign_list = np.sign(tracked_uranium.getvz())
+    
+    if sign_list[iteration] != sign_list[iteration + 1]:
+        bounce_count +=1
+    else:
+        pass
+    
+    
+    #print(0.5*uranium_beam.mass*uranium_beam.getvz()**2/jperev)
+    #print("beam velocity is: ", uranium_beam.getvz())
+    iteration += 1
 
 
 
-
-
+    trackedfile.write('{},{},{},{},{}'.format(iteration, tracked_uranium.getz()[iteration], tracked_uranium.getvz()[iteration],
+                                                     tracked_uranium.getx()[iteration], tracked_uranium.getvx()[iteration]) + "\n")
+    trackedfile.flush()
+    
     for i in range(0,uranium_beam.getz().size):
         trajectoryfile.write('{},{},{},{},{},{}'.format(i, iteration, top.pgroup.zp[i], top.pgroup.uzp[i], top.pgroup.xp[i], top.pgroup.uxp[i]) + "\n")
         trajectoryfile.flush()
@@ -453,9 +495,13 @@ for iteration in range(1,2066*10):
 
 # Close files
 trajectoryfile.close()
+trackedfile.close()
 stddevfile.close()
 poincarefile.close()
 deltazfile.close()
+
+
+
 
 # Print run timing statistics
 printtimers()

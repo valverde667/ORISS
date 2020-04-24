@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 23 19:38:47 2020
+
+@author: nickvalverde
+"""
+
 #Script will first clean trajctoryfile so that it can be read into a pandas DataFrame.
 #The script will then be able to plot using matplotlib or pandas plotting capabilities.
 
@@ -30,9 +38,11 @@ time = 1e-7
 #Read in the data into a dataframe called 'data'.
 column_names = ['Particle', "Iter", "zp[i]", "uzp[i]", "xp[i]", "uxp[i]"]
 data = pd.read_csv('/Users/nickvalverde/Dropbox/Research/ORISS/trajectoryfile.txt', names = column_names)
+tracked_data = pd.read_csv('/Users/nickvalverde/Dropbox/Research/ORISS/tracked_particle.txt', names = column_names[1:])
                                                  #where each line is given by a line break '\n'
 copy = data.copy() #Create copy of data frame
 copy['time'] = copy['Iter']*1e-7
+tracked_data['time'] = tracked_data['Iter']*1e-7
 #Plotting Particles
 ##----Selecting Reference Particel ----
 #--Filter out dataframe with initial velocities for particles
@@ -47,19 +57,22 @@ particles_lost = 0
 z_extent = 710 * mm #maximum extension in z [mm]
 for i in range(len(copy['Particle'].unique())):
     df_zp = copy[copy['Particle'] == i] #sets up a new dataframe for each particle
-    if abs(df_zp['zp[i]'].max()) >= z_extent:
-        particles_lost += 1
-        copy.drop(copy[copy['Particle'] == i].index, inplace = True) #Drop all entries from the dataframe
-                                                                     #of the particle that was lost
-    else:
-        ax.plot(df_zp['time']/micro_sec, df_zp['zp[i]']/mm, c = 'k', lw = 0.5)
+    ax.plot(df_zp['time']/micro_sec, df_zp['zp[i]']/mm, c = 'k', lw = 0.5)
+    # if abs(df_zp['zp[i]'].max()) >= z_extent:
+    #     particles_lost += 1
+    #     copy.drop(copy[copy['Particle'] == i].index, inplace = True) #Drop all entries from the dataframe
+    #                                                                  #of the particle that was lost
+    # else:
+    #     ax.plot(df_zp['time']/micro_sec, df_zp['zp[i]']/mm, c = 'k', lw = 0.5)
 
+ax.plot(tracked_data['time']/micro_sec, tracked_data['zp[i]']/mm, c = 'r', lw = 0.5)
 ax.set_xlabel(r'Time [$\mu$s]')
 ax.set_title(r' Particle Energy = %g [kV], %g Particles Lost' %(2.77, particles_lost))
 ax.set_ylabel('z [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 
-plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/z-trajectory.png', dpi=300)
+plt.tight_layout()
+plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/z-trajectory.png', dpi=300)
 
 
 
@@ -69,14 +82,16 @@ rmin = 60. #mm
 fig, ax = plt.subplots(figsize = (7,7))
 for i in range(len(copy['Particle'].unique())):
     df_xp = copy[data['Particle'] == i] #Create a seperate data frame for plotting xp specifics.
-    if (abs(df_xp['xp[i]'].max())/mm >= rmin) or (abs(df_xp['xp[i]'].min())/mm >= rmin):
-        particles_lost += 1
-        copy.drop(copy[copy['Particle'] == i].index, inplace = True) #Drop all entries from the dataframe
-    else:
-        ax.plot(df_xp['zp[i]']/mm, df_xp['xp[i]']/mm, lw = 0.5, c = 'k')
+    ax.plot(df_xp['zp[i]']/mm, df_xp['xp[i]']/mm, lw = 0.5, c = 'k')
+    #
+    # if (abs(df_xp['xp[i]'].max())/mm >= rmin) or (abs(df_xp['xp[i]'].min())/mm >= rmin):
+    #     particles_lost += 1
+    #     copy.drop(copy[copy['Particle'] == i].index, inplace = True) #Drop all entries from the dataframe
+    # else:
+    #     ax.plot(df_xp['zp[i]']/mm, df_xp['xp[i]']/mm, lw = 0.5, c = 'k')
 
 
-plt.tight_layout()
+ax.plot(tracked_data['zp[i]']/mm, tracked_data['xp[i]']/mm, lw = 0.5, c = 'r')
 
 #Paralell to point setup
 ax.set_xlabel('z [mm]')
@@ -87,8 +102,8 @@ ax.axvline(x=0, alpha=0.7, c = 'k', lw = 0.5)
 
 
 
-
-plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/x-trajectory.png', dpi=300)
+plt.tight_layout()
+plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/x-trajectory.png', dpi=300)
 
 
 
@@ -113,7 +128,7 @@ ax.set_title('Transverse RMS, Particles Lost %g' %particles_lost)
 ax.set_ylabel('x [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 
-plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/rms_x.png', dpi=300)
+plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/rms_x.png', dpi=300)
 
 #--z Moment Plots
 fig, ax = plt.subplots(figsize = (7,7))
@@ -137,7 +152,7 @@ ax.set_title('Transverse RMS, Particles Lost %g' %particles_lost)
 ax.set_ylabel('z [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 
-plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/rms_z.png', dpi=300)
+plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/rms_z.png', dpi=300)
 
 
 

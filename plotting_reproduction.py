@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 #import re
 mm = 1e-3
-micro_sec = 1e-6
+ms = 1e-3
 time = 1e-7
 # =============================================================================
 # #Open Trajectory file and create a new file named cleaned that will be a comma seperated file.
@@ -43,31 +43,34 @@ tracked_data = pd.read_csv('/Users/nickvalverde/Dropbox/Research/ORISS/tracked_p
 copy = data.copy() #Create copy of data frame
 copy['time'] = copy['Iter']*1e-7
 tracked_data['time'] = tracked_data['Iter']*1e-7
-#Plotting Particles
-##----Selecting Reference Particel ----
-#--Filter out dataframe with initial velocities for particles
-#initial_particle_df = copy.loc[0:copy['Particle'].max(),:]
-#--Find reference particle
-#particle = initial_particle_df[abs(initial_particle_df['uzp[i]']<0.001)]
-#--This will return the row with the particle we seek. Need to find out how to get the value in 'Particle.'
 
-##z-trajectory
-fig, ax = plt.subplots(figsize = (7,7))
-particles_lost = 0
-z_extent = 710 * mm #maximum extension in z [mm]
+
+
+
+
+
 for i in range(len(copy['Particle'].unique())):
-    df_zp = copy[copy['Particle'] == i] #sets up a new dataframe for each particle
-    ax.plot(df_zp['time']/micro_sec, df_zp['zp[i]']/mm, c = 'k', lw = 0.5)
-    # if abs(df_zp['zp[i]'].max()) >= z_extent:
-    #     particles_lost += 1
-    #     copy.drop(copy[copy['Particle'] == i].index, inplace = True) #Drop all entries from the dataframe
-    #                                                                  #of the particle that was lost
-    # else:
-    #     ax.plot(df_zp['time']/micro_sec, df_zp['zp[i]']/mm, c = 'k', lw = 0.5)
+    if (len(copy[copy['Particle'] == i]) != len(tracked_data)):
+        copy.drop(copy[copy['Particle'] == i].index, inplace = True)
+    else:
+        pass
 
-ax.plot(tracked_data['time']/micro_sec, tracked_data['zp[i]']/mm, c = 'r', lw = 0.5)
-ax.set_xlabel(r'Time [$\mu$s]')
-ax.set_title(r' Particle Energy = %g [kV], %g Particles Lost' %(2.77, particles_lost))
+
+
+
+
+
+
+
+
+
+## --Point to Point
+fig, ax = plt.subplots(figsize = (7,7))
+ax.scatter(copy['time']/ms, copy['zp[i]']/mm, c = 'k', s = 0.5)
+ax.plot(tracked_data['time']/ms, tracked_data['zp[i]']/mm, c = 'r', lw = 0.9) #Plot Tracer
+
+ax.set_xlabel(r'Time [milliseconds]')
+ax.set_title(r' Particle Energy = %g [kV]' %(2.77))
 ax.set_ylabel('z [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 
@@ -76,31 +79,17 @@ plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/z-tra
 
 
 
-
 ##--Parallel to point
 rmin = 60. #mm
 fig, ax = plt.subplots(figsize = (7,7))
-for i in range(len(copy['Particle'].unique())):
-    df_xp = copy[data['Particle'] == i] #Create a seperate data frame for plotting xp specifics.
-    ax.plot(df_xp['zp[i]']/mm, df_xp['xp[i]']/mm, lw = 0.5, c = 'k')
-    #
-    # if (abs(df_xp['xp[i]'].max())/mm >= rmin) or (abs(df_xp['xp[i]'].min())/mm >= rmin):
-    #     particles_lost += 1
-    #     copy.drop(copy[copy['Particle'] == i].index, inplace = True) #Drop all entries from the dataframe
-    # else:
-    #     ax.plot(df_xp['zp[i]']/mm, df_xp['xp[i]']/mm, lw = 0.5, c = 'k')
+ax.scatter(copy['zp[i]']/mm, copy['xp[i]']/mm, s = 0.5, c = 'k')
+ax.plot(tracked_data['zp[i]']/mm, tracked_data['xp[i]']/mm, lw = 0.9, c = 'r')
 
-
-ax.plot(tracked_data['zp[i]']/mm, tracked_data['xp[i]']/mm, lw = 0.5, c = 'r')
-
-#Paralell to point setup
 ax.set_xlabel('z [mm]')
-ax.set_title('Parallel to Point, %g Particles Lost' %particles_lost)
+ax.set_title('Parallel to Point')
 ax.set_ylabel('x [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 ax.axvline(x=0, alpha=0.7, c = 'k', lw = 0.5)
-
-
 
 plt.tight_layout()
 plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/x-trajectory.png', dpi=300)
@@ -122,9 +111,9 @@ iteration_list = np.array(iteration_list)*time
 stdx_list = np.array(stdx_list)
 
 
-ax.plot(iteration_list/micro_sec, stdx_list/mm)
-ax.set_xlabel(r'Time [$\mu$s]')
-ax.set_title('Transverse RMS, Particles Lost %g' %particles_lost)
+ax.plot(iteration_list/ms, stdx_list/mm)
+ax.set_xlabel(r'Time [milliseconds]')
+ax.set_title('Transverse RMS')
 ax.set_ylabel('x [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 
@@ -146,9 +135,9 @@ stdz_list = np.array(stdz_list)
 
 
 
-ax.plot(iteration_list/micro_sec, stdz_list/mm)
-ax.set_xlabel(r'Time [$\mu$s]')
-ax.set_title('Transverse RMS, Particles Lost %g' %particles_lost)
+ax.plot(iteration_list/ms, stdz_list/mm)
+ax.set_xlabel(r'Time [milliseconds]')
+ax.set_title('Transverse RMS')
 ax.set_ylabel('z [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 

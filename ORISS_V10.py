@@ -191,8 +191,9 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm/10 for i in range(317)]
+xcoord = [(i+1)*mm/85 for i in range(10)]
 load_list = []
+Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)
 
 for xpos in xcoord:
@@ -212,7 +213,7 @@ tracked_uranium =  Species(type=Uranium,charge_state=+1,name="Beam species",weig
 tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_beam.mass))
 
 
-aperture_radius = 6*mm
+aperture_radius = 25*mm
 def scrapebeam():
     rsq = uranium_beam.xp**2 + uranium_beam.yp**2
     uranium_beam.gaminv[rsq >= aperture_radius**2] = -1 #does not save particle, set 0 does.
@@ -233,15 +234,16 @@ installparticlescraper(scrapebeam)
 fig, axes = plt.subplots(nrows = 2, ncols = 1, sharex = True, figsize = (7,7))
 
 ax1, ax2 = axes[0], axes[1]
-ax1.plot(z, getphi(ix=0), label = 'Potential at r = 0')
-ax1.axhline(y=particle_energy, color = 'r', linestyle = '--', label = 'Initial Particle Energy')
+ax1.plot(z, getphi(ix=0)/kV, label = 'Potential at r = 0')
+ax1.axhline(y=particle_energy/kV, color = 'r', linestyle = '--', label = 'Initial Particle Energy')
 ax1.set_title('Initial Potential on Axis vs z ')
-ax1.set_ylabel('Potential (V)')
+ax1.set_ylabel('Potential (KV)')
 ax1.legend()
     #   2) E_z vs z labeled
     #   3) (E_r/r)|_r = 0 vs z labeled ... transverse field gradient vs z
 
 ax2.plot(z,np.gradient(getphi(ix=0)), label = 'Transverse Field Gradient')
+ax2.axhline(y = 0, color = 'k', lw = .5)
 ax2.set_ylabel('Electric Field (V/m)')
 ax2.set_xlabel('Longitudinal Position (m)')
 ax2.legend()
@@ -252,24 +254,6 @@ plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/initial_poten
 ####################################################################
 
 
-#Plotting
-#plg(getphi()[0]/1000.,z,color=black)
-#fma()
-#plg(numpy.gradient(getphi()[0]),z,color=black)
-#fma()
-#plg(-.5*numpy.gradient(numpy.gradient(getphi()[10])),z,color=black)
-#fma()
-
-print(zcentr8 - zcentrIF)
-
-
-
-
-# Open data file of particle initial coordinates
-
-
-species_ratio = 0.1  # put 1/10 in one species and 9/10 in other.
-
 
 ####################################################################
 # Generate Output files for post-process
@@ -278,19 +262,17 @@ species_ratio = 0.1  # put 1/10 in one species and 9/10 in other.
 #Create files
 trajectoryfile = open("trajectoryfile.txt","w")  # saves marker trajectories
 trackedfile = open("tracked_particle.txt", "w")
-poincarefile = open("poincarefile.txt","w")
-deltazfile = open("deltazfile.txt","w")
-stddevfile = open("stddevfile.txt","w")
+
 
 
 #Trajectory File
 #Columns Particle, Iter, zp[i], uzp[i], xp[i], uxp[i]
 for i in range(0,uranium_beam.getz().size):
-    trajectoryfile.write('{},{},{},{},{},{}'.format(i, 0, uranium_beam.zp[i], uranium_beam.uzp[i], 
+    trajectoryfile.write('{},{},{},{},{},{}'.format(i, 0, uranium_beam.zp[i], uranium_beam.uzp[i],
                                                     uranium_beam.xp[i], uranium_beam.uxp[i]) + "\n")
     trajectoryfile.flush()
 
-trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0], 
+trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
                                                     tracked_uranium.getx()[0], tracked_uranium.getvx()[0]) + "\n")
 
 #Stdev File
@@ -298,11 +280,6 @@ bounce_count = 0
 iteration = 0
 while bounce_count < 4:
 #while iteration < 10:
-
-    stddevfile.write(str(np.mean(uranium_beam.zp))+" "+str(np.std(uranium_beam.zp))+" "+
-                     str(np.mean(uranium_beam.xp))+" "+str(np.std(uranium_beam.xp))+"\n")
-    stddevfile.flush()
-
 
     step(1)  # advance particles
     sign_list = np.sign(tracked_uranium.getvz())
@@ -324,18 +301,26 @@ while bounce_count < 4:
     trackedfile.flush()
 
     for i in range(0,uranium_beam.getz().size):
-        trajectoryfile.write('{},{},{},{},{},{}'.format(i, iteration, uranium_beam.zp[i], uranium_beam.uzp[i], 
+        trajectoryfile.write('{},{},{},{},{},{}'.format(i, iteration, uranium_beam.zp[i], uranium_beam.uzp[i],
                                                         uranium_beam.xp[i], uranium_beam.uxp[i]) + "\n")
         trajectoryfile.flush()
-
 
 # Close files
 trajectoryfile.close()
 trackedfile.close()
-stddevfile.close()
-poincarefile.close()
-deltazfile.close()
 
+
+parameterfile = open("parameters.txt", "w")
+variable_list = ["particle_energy", "mass", "time_step", "Np_initial", "zcentr8", "zcentr7", \
+                    "zcentr6", "zcentr5", "zcentr4", "zcentr3", "zcentr2", "zcentr1"]
+
+value_list = [particle_energy, uranium_beam.mass, top.dt, Np, zcentr8, zcentr7, zcentr6, \
+              zcentr5, zcentr4, zcentr3, zcentr2, zcentr1]
+
+for value in value_list:
+    parameterfile.write('{}'.format(value) + "\n")
+
+parameterfile.close()
 
 
 

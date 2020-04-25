@@ -12,6 +12,7 @@ Created on Thu Apr 23 19:38:47 2020
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import time as tm
 #import re
 mm = 1e-3
 ms = 1e-3
@@ -106,7 +107,7 @@ stdx_list = np.array(stdx_list)
 ax.plot(iteration_list/ms, stdx_list/mm)
 ax.set_xlabel(r'Time [milliseconds]')
 ax.set_title('Transverse RMS, {:.2f}% Particles Lost'.format(particles_lost))
-ax.set_ylabel('x [mm]')
+ax.set_ylabel(r'$\sigma_x$ [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 
 plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/rms_x.png', dpi=300)
@@ -122,18 +123,21 @@ for i in range(len(copy['Iter'].unique())):
     stdz_list.append(sample['zp[i]'].std())
     iteration_list.append(i)
 
-iteration_list = np.array(iteration_list)*time
+iteration_list = np.array(iteration_list)*time_step
 stdz_list = np.array(stdz_list)
 
 
 
 ax.plot(iteration_list/ms, stdz_list/mm)
 ax.set_xlabel(r'Time [milliseconds]')
-ax.set_title('Transverse RMS, {:.2f}% Particles Lost'.format(particles_lost))
-ax.set_ylabel('z [mm]')
+ax.set_title('Longitudinal RMS, {:.2f}% Particles Lost'.format(particles_lost))
+ax.set_ylabel(r'$\sigma_z$ [mm]')
 ax.axhline(y=0, alpha=0.7, c = 'k', lw = 0.5)
 
 plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Plot_Reproductions/rms_z.png', dpi=300)
+
+
+
 
 
 

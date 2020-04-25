@@ -191,7 +191,7 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm/85 for i in range(10)]
+xcoord = [(i+1)*mm/100 for i in range(10)]
 load_list = []
 Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)
@@ -199,6 +199,9 @@ p = MyParticle(particle_energy, uranium_beam)
 for xpos in xcoord:
     load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
     avg_coordinates = (xpos, 0, 0)))
+        
+    load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
+    avg_coordinates = (-xpos, 0, 0)))
 
 
 for array in load_list:
@@ -278,7 +281,7 @@ trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_
 #Stdev File
 bounce_count = 0
 iteration = 0
-while bounce_count < 4:
+while bounce_count < 10:
 #while iteration < 10:
 
     step(1)  # advance particles
@@ -323,6 +326,7 @@ for value in value_list:
 parameterfile.close()
 
 
+#prwall top.v
 
 # Print run timing statistics
 # printtimers()

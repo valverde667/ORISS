@@ -9,6 +9,10 @@ from fill_ellipse import *
 import matplotlib.pyplot as plt
 import numpy as np
 
+import time
+start_time = time.time()
+
+print("--- %s seconds ---" % (time.time() - start_time))
 
 
 ####################################################################
@@ -191,7 +195,7 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm/100 for i in range(10)]
+xcoord = [(i+1)*mm for i in range(100)]
 load_list = []
 Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)
@@ -216,6 +220,7 @@ tracked_uranium =  Species(type=Uranium,charge_state=+1,name="Beam species",weig
 tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_beam.mass))
 
 
+#top.prwall = 25*mm
 aperture_radius = 25*mm
 def scrapebeam():
     rsq = uranium_beam.xp**2 + uranium_beam.yp**2
@@ -325,6 +330,7 @@ for value in value_list:
 
 parameterfile.close()
 
+print("--- %s seconds ---" % (time.time() - start_time))
 
 #prwall top.v
 

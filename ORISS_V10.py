@@ -195,7 +195,7 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm for i in range(100)]
+xcoord = [(i+1)*mm/10 for i in range(10)]
 load_list = []
 Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)
@@ -286,7 +286,7 @@ trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_
 #Stdev File
 bounce_count = 0
 iteration = 0
-while bounce_count < 10:
+while bounce_count < 6:
 #while iteration < 10:
 
     step(1)  # advance particles

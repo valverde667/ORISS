@@ -195,7 +195,7 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm/10 for i in range(200)]
+xcoord = [(i+1)*mm/10 for i in range(100)]
 load_list = []
 Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)

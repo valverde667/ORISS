@@ -195,7 +195,7 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm/10 for i in range(100)]
+xcoord = [(i+1)*mm /10for i in range(100)]
 load_list = []
 Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)
@@ -220,7 +220,7 @@ tracked_uranium =  Species(type=Uranium,charge_state=+1,name="Beam species",weig
 tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_beam.mass))
 
 
-#top.prwall = 25*mm
+#top.prwall = 25*mm #Could not get to work. Loaded particles well out of 25mm and they survived. 
 aperture_radius = 25*mm
 def scrapebeam():
     rsq = uranium_beam.xp**2 + uranium_beam.yp**2

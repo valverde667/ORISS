@@ -41,7 +41,7 @@ f.close()
 #--Create two dataframes. One that will be for the ideal particle (tracked_data)
 #  and one that will be for all other particles (data)
 #Create dataframes
-column_names = ['Particle', "Iter", "zp[i]", "uzp[i]", "xp[i]", "uxp[i]"]
+column_names = ['Particle', "Iter", "zp[i]", "uzp[i]", "xp[i]", "uxp[i]", "yp[i]", "uyp[i]"]
 data = pd.read_csv('/Users/nickvalverde/Dropbox/Research/ORISS/trajectoryfile.txt', names = column_names)
 tracked_data = pd.read_csv('/Users/nickvalverde/Dropbox/Research/ORISS/tracked_particle.txt', names = column_names[1:])
 
@@ -49,6 +49,11 @@ tracked_data = pd.read_csv('/Users/nickvalverde/Dropbox/Research/ORISS/tracked_p
 copy = data.copy() #Create copy of data
 copy['time'] = copy['Iter']*time_step
 tracked_data['time'] = tracked_data['Iter']*time_step
+
+
+#Add an r = sqrt(x_i**2 + y_i**2) column
+copy['r'] = np.sqrt(copy['xp[i]']**2 + copy['yp[i]']**2)
+
 
 #--Cleans dataframe of lost particles if needed.
 # for i in range(len(copy['Particle'].unique())):
@@ -62,16 +67,16 @@ Np = len(copy['Particle'].unique()) #number of particles including lost particle
 
 #--Create standard deviations data
 
-stdx_data = []
+stdr_data = []
 stdz_data = []
 
 for i in range(len(copy['Iter'].unique())):
     #Get position data for x and z for ith iteration
-    x_sample = copy[copy['Iter'] == i]['xp[i]']
+    r_sample = copy[copy['Iter'] == i]['r']
     z_sample = copy[copy['Iter'] == i]['zp[i]']
 
     #Calculate standard deviations and append them to lists
-    stdx_data.append(x_sample.std())
+    stdr_data.append(r_sample.std())
     stdz_data.append(z_sample.std())
 
 #Set min and max values for plots
@@ -82,43 +87,43 @@ for i in range(len(copy['Iter'].unique())):
 
 #Set min and max values for plots
 #std plots
-stdx_min = min(stdx_data)
-stdx_max = max(stdx_data)
+stdr_min = min(stdr_data)
+stdr_max = max(stdr_data)
 stdz_min = min(stdz_data)
 stdz_max = max(stdz_data)
 #position plots
-xmin = copy['xp[i]'].min()
-xmax = copy['xp[i]'].max()
+rmin = copy['r'].min()
+rmax = copy['r'].max()
 zmin = copy['zp[i]'].min()
 zmax = copy['zp[i]'].max()
 
 #Will do x-statstics first
 fig = plt.figure(figsize = (7,7))
-xax = fig.add_subplot(2, 1, 1)
-stdxax = fig.add_subplot(2, 1, 2, sharex = xax)
+rax = fig.add_subplot(2, 1, 1)
+stdrax = fig.add_subplot(2, 1, 2, sharex = rax)
 #-------------------------------------------------------------------------------
 # #--Old routine didn't alow specified axis sharing
 # fig, ax = plt.subplots(nrows = 2, ncols = 1, figsize=(7,7), sharex = True)
 # xax = ax[0]
 # stdxax = ax[1]
 #-------------------------------------------------------------------------------
-xax.set_xlim(zmin/mm, zmax/mm)
-xax.set_ylim(xmin/mm, xmax/mm)
-stdxax.set_ylim(stdx_min/mm, stdx_max/mm)
+rax.set_xlim(zmin/mm, zmax/mm)
+rax.set_ylim(rmin/mm, rmax/mm)
+stdrax.set_ylim(stdr_min/mm, stdr_max/mm)
 
 
-xax.axhline(y = 0, lw = .5, c = 'k')
-xax.axvline(x = 0, lw = .5, c = 'k')
-stdxax.axvline(x = 0, lw = .5, c = 'k')
+rax.axhline(y = 0, lw = .5, c = 'k')
+rax.axvline(x = 0, lw = .5, c = 'k')
+stdrax.axvline(x = 0, lw = .5, c = 'k')
 
-stdxax.set_xlabel("z [mm]",fontsize=14)
-xax.set_ylabel("x [mm]",fontsize=14)
-stdxax.set_ylabel(r'$\sigma_x$[mm]', fontsize = 14)
+stdrax.set_xlabel("z [mm]",fontsize=14)
+rax.set_ylabel( "r [mm]",fontsize=14)
+stdrax.set_ylabel(r'$\sigma_{r}$[mm]', fontsize = 14)
 
 
 
-xax.set_title('X-trajectory vs Longitudinal Position', fontsize = 18)
-stdxax.set_title(r'$\sigma_x$ vs Longitudinal Position', fontsize = 18)
+rax.set_title(' r vs Longitudinal Position', fontsize = 18)
+stdrax.set_title(r'$\sigma_{r}$ vs Longitudinal Position', fontsize = 18)
 
 plt.tight_layout()
 
@@ -126,9 +131,9 @@ plt.tight_layout()
 #--Movie Creation
 
 #Initialize empty scattery for trajectory and line plot for RMS visualization
-scat = xax.scatter([], [], s = .5, c = 'k') #Create empty scatter plot to be updated
-ideal_scat = xax.scatter([], [], s=1.5, c = 'r')
-line, = stdxax.plot([], [], lw = 1, c = 'k')#create empty line plot to be updated
+scat = rax.scatter([], [], s = .5, c = 'k') #Create empty scatter plot to be updated
+ideal_scat = rax.scatter([], [], s=1.5, c = 'r')
+line, = stdrax.plot([], [], lw = 1, c = 'k')#create empty line plot to be updated
 
 
 
@@ -146,7 +151,7 @@ def animate(i):
 
     #particle data points
     coords = copy[copy['Iter'] == i] #Creates a data frame for all other particles for the ith iteration
-    xpoints = coords['xp[i]']/mm     #x-coordinates for all other particles for ith iteration
+    rpoints = coords['r']/mm     #x-coordinates for all other particles for ith iteration
     zpoints = coords['zp[i]']/mm     #z-coordinates on tracker particle for ith iteration
 
     #ideal particle data points
@@ -154,20 +159,20 @@ def animate(i):
     ideal_zpoint = tracked_data[tracked_data['Iter'] == i]['zp[i]']/mm #z-coordinate of ideal particle
 
     #x-rms data points
-    stdx_zpoint = tracked_data['zp[i]'][0:i]/mm #z-coordinate from 0 to ith iteration
-    stdx_point = np.array(stdx_data[0:i])/mm #std in x from 0 to ith iteration
+    stdr_zpoint = tracked_data['zp[i]'][0:i]/mm #z-coordinate from 0 to ith iteration
+    stdr_point = np.array(stdr_data[0:i])/mm #std in x from 0 to ith iteration
 
    
 
     #Create arrays to feed into scatter plots using scat.set_offsets.
     #It is important to note tha set_offsets takes in (N,2) arrays. This is the reasoning for
     #adding np.newaxis the command. These arrays are then ((x,y), newaxis).
-    scat_plot_points = np.hstack((zpoints[:, np.newaxis], xpoints[:, np.newaxis]))
+    scat_plot_points = np.hstack((zpoints[:, np.newaxis], rpoints[:, np.newaxis]))
     ideal_scat_point = np.hstack((ideal_zpoint[:, np.newaxis], ideal_xpoint[:, np.newaxis]))
     #Enter in new plot points.
     scat.set_offsets(scat_plot_points)
     ideal_scat.set_offsets(ideal_scat_point)
-    line.set_data(stdx_zpoint, stdx_point)
+    line.set_data(stdr_zpoint, stdr_point)
     #Update plots
     return scat,ideal_scat, line
 

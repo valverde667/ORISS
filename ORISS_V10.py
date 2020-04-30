@@ -276,11 +276,12 @@ trackedfile = open("tracked_particle.txt", "w")
 #Trajectory File
 #Columns Particle, Iter, zp[i], uzp[i], xp[i], uxp[i]
 for i in range(0,uranium_beam.getz().size):
-    trajectoryfile.write('{},{},{},{},{},{}'.format(i, 0, uranium_beam.zp[i], uranium_beam.uzp[i],
-                                                    uranium_beam.xp[i], uranium_beam.uxp[i]) + "\n")
+    trajectoryfile.write('{},{},{},{},{},{},{},{}'.format(i, 0, uranium_beam.zp[i], uranium_beam.uzp[i],
+                                                    uranium_beam.xp[i], uranium_beam.uxp[i], \
+                                                        uranium_beam.yp[i], uranium_beam.uyp[i]) + "\n")
     trajectoryfile.flush()
 
-trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
+trackedfile.write('{},{},{},{},{},'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
                                                     tracked_uranium.getx()[0], tracked_uranium.getvx()[0]) + "\n")
 
 #Stdev File
@@ -304,13 +305,14 @@ while bounce_count < 3:
 
 
 
-    trackedfile.write('{},{},{},{},{}'.format(iteration, tracked_uranium.getz()[iteration], tracked_uranium.getvz()[iteration],
+    trackedfile.write('{},{},{},{},{},{},{}'.format(iteration, tracked_uranium.getz()[iteration], tracked_uranium.getvz()[iteration],
                                                      tracked_uranium.getx()[iteration], tracked_uranium.getvx()[iteration]) + "\n")
     trackedfile.flush()
 
     for i in range(0,uranium_beam.getz().size):
         trajectoryfile.write('{},{},{},{},{},{}'.format(i, iteration, uranium_beam.zp[i], uranium_beam.uzp[i],
-                                                        uranium_beam.xp[i], uranium_beam.uxp[i]) + "\n")
+                                                        uranium_beam.xp[i], uranium_beam.uxp[i], \
+                                                            uranium_beam.yp[i], uranium_beam.uyp[i]) + "\n")
         trajectoryfile.flush()
 
 # Close files

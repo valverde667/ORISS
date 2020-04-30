@@ -58,8 +58,8 @@ z = linspace(-1.,1.,w3d.nz+1)
 
 #--Load parameters
 particle_energy = 2.77*kV #2.77 kV is good for both point-point and ||-point
-sigma_list = (1*mm, 1*mm, .1*mm)               #Standard deviations (sx, sy, sz)
-Np = 500                                         #Number of particles
+sigma_list = (10*mm, 10*mm, 3*mm)               #Standard deviations (sx, sy, sz)
+Np = 3000                                         #Number of particles
 temp_list = (8.62e-5, 8.62e-5)                 #[eV] corresponds to 1K
 pos_dist = 'gaussian'                          #Distribution for position
 vel_dist = 'gaussian'                          #Distribution for velocity
@@ -168,7 +168,7 @@ plt.savefig(filestring + 'r-z.png', dpi=300)
 
 
 vxxplot = plt.figure(5)
-plt.scatter(xpos_list/mm, vx_list, s = .5, c = 'k')
+plt.scatter(xpos_list/mm, vx_list, s = .5)
 plt.title('vx-x', fontsize = 16)
 plt.xlabel("x [m]", fontsize = 14)
 plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
@@ -177,7 +177,7 @@ plt.savefig(filestring + 'vx-x.png', dpi=300)
 
 
 vyyplot = plt.figure(6)
-plt.scatter(ypos_list/mm, vy_list, s = .5, c = 'k')
+plt.scatter(ypos_list/mm, vy_list, s = .5)
 plt.title('vy-y', fontsize = 16)
 plt.xlabel("y[mm]", fontsize = 14)
 plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
@@ -269,8 +269,9 @@ trackedfile = open("tracked_particle.txt", "w")
 #Trajectory File
 #Columns Particle, Iter, zp[i], uzp[i], xp[i], uxp[i]
 for i in range(0,uranium_beam.getz().size):
-    trajectoryfile.write('{},{},{},{},{},{}'.format(i, 0, uranium_beam.zp[i], uranium_beam.uzp[i],
-                                                    uranium_beam.xp[i], uranium_beam.uxp[i]) + "\n")
+    trajectoryfile.write('{},{},{},{},{},{},{},{}'.format(i, 0, uranium_beam.zp[i], uranium_beam.uzp[i],
+                                                    uranium_beam.xp[i], uranium_beam.uxp[i], \
+                                                        uranium_beam.yp[i], uranium_beam.uyp[i]) + "\n")
     trajectoryfile.flush()
 
 trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
@@ -279,7 +280,7 @@ trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_
 #Stdev File
 bounce_count = 0
 iteration = 0
-while bounce_count < 1:
+while bounce_count < 4:
 #while iteration < 10:
 
     step(1)  # advance particles
@@ -302,8 +303,9 @@ while bounce_count < 1:
     trackedfile.flush()
 
     for i in range(0,uranium_beam.getz().size):
-        trajectoryfile.write('{},{},{},{},{},{}'.format(i, iteration, uranium_beam.zp[i], uranium_beam.uzp[i],
-                                                        uranium_beam.xp[i], uranium_beam.uxp[i]) + "\n")
+        trajectoryfile.write('{},{},{},{},{},{},{},{}'.format(i, iteration, uranium_beam.zp[i], uranium_beam.uzp[i],
+                                                        uranium_beam.xp[i], uranium_beam.uxp[i], uranium_beam.yp[i], \
+                                                            uranium_beam.uyp[i]) + "\n")
         trajectoryfile.flush()
 
 # Close files

@@ -36,7 +36,7 @@ top.pboundxy = absorb #boundary condition at edge or radial mesh
 
 
 #Create Species of particles to advance
-uranium_beam = Species(type=Uranium,charge_state=+1,name="Beam species",weight=1) #weight = 0 no spacecharge, 1 = spacecharge. Both go through Poisson sovler.
+uranium_beam = Species(type=Uranium,charge_state=+1,name="Beam species",weight=0) #weight = 0 no spacecharge, 1 = spacecharge. Both go through Poisson sovler.
 
 top.lbeamcom = False # Specify grid does not move to follow beam center of mass as appropriate for trap simulation
 
@@ -51,7 +51,7 @@ generate()     # Initate code, this will also make an initial fieldsolve
 
 
 
-solver.ldosolve = True #This sets up the field solver with the beam fields.
+solver.ldosolve = False #This sets up the field solver with the beam fields.
                      #particles are treated as interacting. False, turns off space charge
 limits(-1.,1.)
 z = linspace(-1.,1.,w3d.nz+1)
@@ -280,7 +280,7 @@ trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_
 #Stdev File
 bounce_count = 0
 iteration = 0
-while bounce_count < 4:
+while bounce_count <= 4:
 #while iteration < 10:
 
     step(1)  # advance particles

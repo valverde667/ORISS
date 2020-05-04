@@ -195,7 +195,7 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm for i in range(100)]
+xcoord = [(i+1)*mm/10 for i in range(100)]
 load_list = []
 Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)
@@ -221,13 +221,15 @@ tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_be
 
 
 #top.prwall = 25*mm #Could not get to work. Loaded particles well out of 25mm and they survived. 
-top.lsavelostpart = True
 aperture_radius = 25*mm
 def scrapebeam():
     rsq = uranium_beam.xp**2 + uranium_beam.yp**2
     uranium_beam.gaminv[rsq >= aperture_radius**2] = 0 #does not save particle, set 0 does.
 
+#target = ZCylinder(25*mm,2,zcent=0)
+#scraper = ParticleScraper(conductors = [target], lcollectlpdata=1)
 installparticlescraper(scrapebeam)
+top.lsavelostpart = 1
 
 
 
@@ -282,15 +284,17 @@ for i in range(0,uranium_beam.getz().size):
                                                         uranium_beam.yp[i], uranium_beam.uyp[i]) + "\n")
     trajectoryfile.flush()
 
-trackedfile.write('{},{},{},{},{},'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
-                                                    tracked_uranium.getx()[0], tracked_uranium.getvx()[0]) + "\n")
+#Columns Particle, Iter, zp[i], uzp[i], xp[i], uxp[i], # lost particles
+trackedfile.write('{},{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
+                                                    tracked_uranium.getx()[0], tracked_uranium.getvx()[0], 
+                                                    len(uranium_beam.getx(lost=1))) + "\n")
 
 #Stdev File
 bounce_count = 0
 iteration = 0
 while bounce_count <= 3:
 #while iteration < 10:
-
+    
     step(1)  # advance particles
     sign_list = np.sign(tracked_uranium.getvz())
 

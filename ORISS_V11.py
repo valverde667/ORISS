@@ -87,9 +87,10 @@ tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_be
 aperture_radius = 25*mm
 def scrapebeam():
     rsq = uranium_beam.xp**2 + uranium_beam.yp**2
-    uranium_beam.gaminv[rsq >= aperture_radius**2] = -1 #does not save particle, set 0 does.
+    uranium_beam.gaminv[rsq >= aperture_radius**2] = 0 #does not save particle, set 0 does.
 
 installparticlescraper(scrapebeam)
+top.lsavelostpart = 1
 
 
 # =============================================================================
@@ -273,14 +274,15 @@ for i in range(0,uranium_beam.getz().size):
                                                     uranium_beam.xp[i], uranium_beam.uxp[i], \
                                                         uranium_beam.yp[i], uranium_beam.uyp[i]) + "\n")
     trajectoryfile.flush()
+#Columns Particle, Iter, zp[i], uzp[i], xp[i], uxp[i], #Lost
+trackedfile.write('{},{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0], \
+                                                    tracked_uranium.getx()[0], tracked_uranium.getvx()[0], \
+                                                    len(uranium_beam.getx(lost=1))) + "\n")
 
-trackedfile.write('{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
-                                                    tracked_uranium.getx()[0], tracked_uranium.getvx()[0]) + "\n")
 
-#Stdev File
 bounce_count = 0
 iteration = 0
-while bounce_count <= 4:
+while bounce_count <=2:
 #while iteration < 10:
 
     step(1)  # advance particles
@@ -298,12 +300,13 @@ while bounce_count <= 4:
 
 
 
-    trackedfile.write('{},{},{},{},{}'.format(iteration, tracked_uranium.getz()[iteration], tracked_uranium.getvz()[iteration],
-                                                     tracked_uranium.getx()[iteration], tracked_uranium.getvx()[iteration]) + "\n")
+    trackedfile.write('{},{},{},{},{},{}'.format(iteration, tracked_uranium.getz()[iteration], tracked_uranium.getvz()[iteration], \
+                                                     tracked_uranium.getx()[iteration], tracked_uranium.getvx()[iteration], \
+                                                     len(uranium_beam.getx(lost=1))) + "\n")
     trackedfile.flush()
 
     for i in range(0,uranium_beam.getz().size):
-        trajectoryfile.write('{},{},{},{},{},{},{},{}'.format(i, iteration, uranium_beam.zp[i], uranium_beam.uzp[i],
+        trajectoryfile.write('{},{},{},{},{},{},{},{}'.format(i, iteration, uranium_beam.zp[i], uranium_beam.uzp[i], \
                                                         uranium_beam.xp[i], uranium_beam.uxp[i], uranium_beam.yp[i], \
                                                             uranium_beam.uyp[i]) + "\n")
         trajectoryfile.flush()

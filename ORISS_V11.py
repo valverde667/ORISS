@@ -7,6 +7,7 @@ from Forthon import *
 from Particle_Class import *
 from fill_ellipse import *
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import numpy as np
 
 import time
@@ -56,6 +57,16 @@ solver.ldosolve = False #This sets up the field solver with the beam fields.
 limits(-1.,1.)
 z = linspace(-1.,1.,w3d.nz+1)
 
+
+
+
+
+
+####################################################################
+
+
+
+# Create Particle distributions with loader
 #--Load parameters
 particle_energy = 2.77*kV #2.77 kV is good for both point-point and ||-point
 sigma_list = (10*mm, 10*mm, 3*mm)               #Standard deviations (sx, sy, sz)
@@ -92,8 +103,6 @@ def scrapebeam():
 installparticlescraper(scrapebeam)
 top.lsavelostpart = 1
 
-
-# =============================================================================
 #-- Create Distribution Plots
 
 #Create empty list to populate with coordinate data
@@ -126,7 +135,7 @@ vy_list = np.array(vy_list)
 vz_list = np.array(vz_list)
 
 #Filestring is useful for saving images. 
-filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/' 
+filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnostics/Distribution' 
 
 #-- Create figure for each dist plot and plot.
 #  It is import to create a separate figure for each or else data will mix into 
@@ -221,29 +230,25 @@ plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
 plt.tight_layout()
 plt.savefig(filestring + 'vy-vx.png', dpi=300)
 plt.show()
-# =============================================================================
-
-
-
+# ============================================================================
 
 ####################################################################
 # Setup Diagnostics and make initial diagnostic plots
 #
-#  Make nice initial field diagnostic plots with labels.  Make plots of:
-#   1) phi(r=0,z) vs z in volts
-#   1a) repeat 1) and put the inital bunch energy on in units of volts
 
+diagnostic_filestring  = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnostics/Fields'
+#--Plot Fields 
 fig, axes = plt.subplots(nrows = 2, ncols = 1, sharex = True, figsize = (7,7))
 
+#Electric Potential
 ax1, ax2 = axes[0], axes[1]
 ax1.plot(z, getphi(ix=0)/kV, label = 'Potential at r = 0')
 ax1.axhline(y=particle_energy/kV, color = 'r', linestyle = '--', label = 'Initial Particle Energy')
 ax1.set_title('Initial Potential on Axis vs z ')
 ax1.set_ylabel('Potential (KV)')
 ax1.legend()
-    #   2) E_z vs z labeled
-    #   3) (E_r/r)|_r = 0 vs z labeled ... transverse field gradient vs z
-
+    
+#Electric Field
 ax2.plot(z,np.gradient(getphi(ix=0)), label = 'Transverse Field Gradient')
 ax2.axhline(y = 0, color = 'k', lw = .5)
 ax2.set_ylabel('Electric Field (V/m)')
@@ -251,12 +256,36 @@ ax2.set_xlabel('Longitudinal Position (m)')
 ax2.legend()
 
 plt.tight_layout()
-plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/initial_potential.png', dpi=300)
+plt.savefig(diagnostic_filestring + 'on-axis_E-V_fields.png', dpi=300)
+
+
+#--Contour Plot
+fig,ax = plt.subplots(figsize=(9,9))
+ax.set_title('Electric Potential Contours in r-z')
+ax.set_xlabel('z [mm]')
+ax.set_ylabel('r[mm]')
+#p = ax.pcolor(w3d.zmesh/mm, w3d.xmesh/mm, getphi(), cmap=cm.gray, vmin=abs(getphi()).min(), vmax=abs(getphi()).max())
+#cb = fig.colorbar(p, shrink = 0.8, ax=ax)
+
+levels = 11 #draw nine contour lines
+cnt = ax.contour(w3d.zmesh/mm, w3d.xmesh/mm, getphi(), levels, cmap=cm.hsv, linewidths = .7)
+CB = fig.colorbar(cnt, shrink= 0.8, extend='both')
+
+l, b, w, h = ax.get_position().bounds
+#-Adjust gray color bar
+ll, bb, ww, hh = cb.ax.get_position().bounds
+cb.ax.set_position([ll, b + 0.1*h, ww, h*0.8])
+
+plt.show()
+plt.savefig(diagnostic_filestring + 'contour_E-V_fields.png', dpi=400)
+
+
 
 ####################################################################
 
 
 
+raise Exception()
 ####################################################################
 # Generate Output files for post-process
 ####################################################################

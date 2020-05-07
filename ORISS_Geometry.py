@@ -63,23 +63,22 @@ Rmin = 70.*mm # Inner radius of electrode (center to inner interface) annulus.
 RminIF = 60.*mm# # Inner radius of chamber before drift space
 Rmax = 71.*mm # Outer radius of electrode (center to outer interface) annulus
 RmaxIF = 61.*mm # Outer radius of chamber before drift space.
-Length = 27.98*mm
+Length = 27.98*mm #Length between electrodes minus the small gap
 LengthIF = 43.05*mm
 Cone = 44.99*mm
 drift = 430.68*mm
 
 # Voltages of rings and cone number from left to right on rings from end
-Vcone = +0
-V00   = +0000
-V01   = -0
-#V01  = -0
-V02   = 0
+Vcone = 0.
+V00   = 0.
+V01   = 0.
+V02   = 0.
 V03   = 0.
 V04   = 0.
-V05   = +00
-V06   = +00
-V07   = +00
-V08   = +8.*kV
+V05   = 0.
+V06   = 0.
+V07   = 0.
+V08   = 8.*kV
 
 # z-centers of right rings
 zcentr8=Cone+gap+LengthIF+drift+LengthIF+gap+2*Cone+gap+7*(Length+gap)+Length/2.-(Cone+gap+LengthIF+drift/2)

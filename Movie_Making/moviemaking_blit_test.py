@@ -27,7 +27,7 @@ ms = 1e-3
 time = 1e-7
 kV = 1000.
 
-#--Read in variables and assign values from parameters.txt. 
+#--Read in variables and assign values from parameters.txt.
 #Variables that are in the parameters.txt file
 variable_list = ["particle_energy", "mass", "time_step", "Np_initial", "zcentr8", "zcentr7", \
                     "zcentr6", "zcentr5", "zcentr4", "zcentr3", "zcentr2", "zcentr1"]
@@ -50,14 +50,14 @@ copy = data.copy() #Create copy of data
 copy['time'] = copy['Iter']*time_step
 tracked_data['time'] = tracked_data['Iter']*time_step
 
-#--Cleans dataframe of lost particles if needed. 
+#--Cleans dataframe of lost particles if needed.
 # for i in range(len(copy['Particle'].unique())):
 #     if (len(copy[copy['Particle'] == i]) != len(tracked_data)):
 #         copy.drop(copy[copy['Particle'] == i].index, inplace = True)
 #     else:
 #         pass
 
-Np = len(copy['Particle'].unique()) #number of particles including lost particles. 
+Np = len(copy['Particle'].unique()) #number of particles including lost particles.
 
 
 #--Create figures for plotting
@@ -100,13 +100,13 @@ def animate(i):
     xpoints = coords['xp[i]']/mm     #x-coordinates for all other particles for ith iteration
     zpoints = coords['zp[i]']/mm     #z-coordinates on tracker particle for ith iteration
 
-    #Create arrays to feed into scatter plots using scat.set_offsets. 
-    #It is important to note tha set_offsets takes in (N,2) arrays. This is the reasoning for 
-    #adding np.newaxis the command. These arrays are then ((x,y), newaxis). 
-    plot_points = np.hstack((zpoints[:, np.newaxis], xpoints[:, np.newaxis])) 
+    #Create arrays to feed into scatter plots using scat.set_offsets.
+    #It is important to note tha set_offsets takes in (N,2) arrays. This is the reasoning for
+    #adding np.newaxis the command. These arrays are then ((x,y), newaxis).
+    plot_points = np.hstack((zpoints[:, np.newaxis], xpoints[:, np.newaxis]))
     ideal_points = np.hstack((ideal_z[:, np.newaxis], ideal_x[:, np.newaxis]))
 
-    #Eneter in new plot points. 
+    #Eneter in new plot points.
     scat.set_offsets(plot_points)
     ideal_scat.set_offsets(ideal_points)
 
@@ -120,9 +120,9 @@ def animate(i):
 #--Animating and saving
 num_of_frames = len(copy['Iter'].unique()) #number of times animate() will be called
 Writer = animation.writers['ffmpeg'] #for saving purposes
-writer = Writer(fps=50, metadata=dict(artist='Me'), bitrate=1800) #Some video settings. 
+writer = Writer(fps=50, metadata=dict(artist='Me'), bitrate=1800) #Some video settings.
 #Ani is the actual animations. interval is interval between frames in microsecons. Blit is what speeds up the animation process
-#by only plotting the changes rather then replotting each frame. 
+#by only plotting the changes rather then replotting each frame.
 ani = animation.FuncAnimation(fig, animate, frames=num_of_frames-1, interval=100, repeat=True, blit = True) #The actual animator
 plt.show()
 ani.save('/Users/nickvalverde/Dropbox/Research/ORISS/Movie_Plots/scatter_blit.mp4', writer=writer)

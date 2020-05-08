@@ -31,7 +31,7 @@ w3d.solvergeom = w3d.RZgeom # Setting Solver Geometry. In this case this is
 ##Set boundary conditions
 
 #Boundary conditions for mesh
-w3d.bound0  = dirichlet # for iz == 0
+w3d.bound0  = dirichlet # for iz == -nz
 w3d.boundnz = dirichlet # for iz == nz
 w3d.boundxy = dirichlet #in all transverse directions
 
@@ -144,8 +144,12 @@ zl6=ZAnnulus(rmin=Rmin,rmax=Rmax,length=Length,voltage=V06,zcent=zcentl6)
 zl7=ZAnnulus(rmin=Rmin,rmax=Rmax,length=Length,voltage=V07,zcent=zcentl7)
 zl8=ZAnnulus(rmin=Rmin,rmax=Rmax,length=Length,voltage=V08,zcent=zcentl8)
 
-
+#--Conductors for End Walls
+#Left wall
+leftwall=ZAnnulus(rmin=25*mm,rmax=Rmax,length=Length, voltage=0, zcent = -zcentr8-Length)
+rightwall=ZAnnulus(rmin=25*mm,rmax=Rmax,length=Length, voltage=0, zcent= zcentr8+Length)
 #--Install conductors on mesh.  These are placed with subgrid precision
+installconductor(rightwall)
 installconductor(zr8)
 installconductor(zr7)
 installconductor(zr6)
@@ -167,3 +171,4 @@ installconductor(zl5)
 installconductor(zl6)
 installconductor(zl7)
 installconductor(zl8)
+installconductor(leftwall)

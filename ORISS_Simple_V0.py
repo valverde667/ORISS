@@ -195,7 +195,7 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i+1)*mm/50 for i in range(5)]
+xcoord = [(i)*mm/10 for i in range(61)] #6mm Threshold for no particles lost
 load_list = []
 Np = len(xcoord)
 p = MyParticle(particle_energy, uranium_beam)
@@ -292,7 +292,7 @@ trackedfile.write('{},{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], track
 #Stdev File
 bounce_count = 0
 iteration = 0
-while bounce_count <= 4:
+while bounce_count <= 10:
 #while iteration < 10:
     
     step(1)  # advance particles
@@ -310,7 +310,7 @@ while bounce_count <= 4:
 
 
 
-    trackedfile.write('{},{},{},{},{}'.format(iteration, tracked_uranium.getz()[iteration], tracked_uranium.getvz()[iteration],
+    trackedfile.write('{},{},{},{},{},{}'.format(iteration, tracked_uranium.getz()[iteration], tracked_uranium.getvz()[iteration],
                                                      tracked_uranium.getx()[iteration], tracked_uranium.getvx()[iteration],
                                                      len(uranium_beam.getx(lost=1))) + "\n")
     trackedfile.flush()

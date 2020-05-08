@@ -10,7 +10,7 @@ import numpy as np
 from math import sin, cos, pi
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-# 
+#
 # x_list = np.linspace(0, 2*pi, 101)
 # y = lambda x: cos(x)
 # z = lambda x: sin(x)
@@ -314,20 +314,40 @@ import matplotlib.animation as animation
 
 
 #-- Blit Scatter with Multiple Plots
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import animation
-
-
-
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from matplotlib import animation
+#
+#
+#
+#
+# func = lambda x: np.cos(x)
+# zfunc = lambda x: np.sin(x)
+# x = np.linspace(0,2*pi, 1001)
+# y = func(x)
+# z = zfunc(x)
+#
+# fig, ax = plt.subplots()
+# for i in range(len(x)):
+#     if x[i] <= np.pi:
+#         yscat = ax.scatter(x[i],y[i], s = .2)
+#         yscat.set_color('r')
+#     else:
+#         yscat = ax.scatter(x[i], y[i], c = 'm', s = .2)
+#
+#     zscat = ax.scatter(x,z, s = .2, c= 'k')
+#
+# yscat.set_label('y')
+# zscat.set_label('z')
+# plt.legend()
+# plt.show()
+#
 
 func = lambda x: np.cos(x)
 zfunc = lambda x: np.sin(x)
-x = np.linspace(0,2*pi, 1001)
+x = np.linspace(0,2*pi, 301)
 y = func(x)
 z = zfunc(x)
-
-
 
 fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize = (7,7), sharex = True, sharey = True)
 
@@ -351,7 +371,7 @@ plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=Fa
 plt.xlabel("x", fontsize = 14)
 plt.tight_layout()
 
-scat1 = yax.scatter([], [], s=10, c = 'c' , label = r'$\cos(x)$')
+scat1 = yax.scatter([], [], s=10, label = r'$\cos(x)$')
 scat2 = zax.scatter([], [], s=10, c = 'r', label = r'$\sin(x)$')
 
 def init():
@@ -362,7 +382,13 @@ def init():
 
 
 def animate(i):
-    data1 = np.hstack((x[i, np.newaxis], y[i, np.newaxis])) #new axis keeps dimension (N,2). Can plot all particles by using x[0:i]
+    print(i)
+    if x[i] <= np.pi:
+        scat1.set_color('k')
+    else:
+        scat1.set_color('c')
+
+    data1 = np.hstack((x[,np.newaxis], y[, np.newaxis]))
     data2 = np.hstack((x[i,np.newaxis], z[i, np.newaxis]))
 
     scat1.set_offsets(data1)
@@ -375,4 +401,4 @@ writer = Writer(fps=50, metadata=dict(artist='Me'), bitrate=1800)
 anim = animation.FuncAnimation(fig, animate, init_func=init,
 							frames=len(x), interval=20, blit=True)
 # save the animation as mp4 video file
-anim.save('/Users/nickvalverde/Dropbox/Research/ORISS/Movie_Plots/Blit_test.mp4',writer=writer)
+anim.save('/Users/nickvalverde/Dropbox/Research/ORISS/color-switch-test.mp4',writer=writer)

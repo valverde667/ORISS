@@ -97,16 +97,15 @@ xcom_coords = xcom_coords
 
 #Set min and max values for plots
 #std plots
-stdx_min = min(stdx_data)
-stdx_max = max(stdx_data)
-stdz_min = min(stdz_data)
+stdx_min = 0
+stdx_max = (1+.1)*max(stdx_data)
+stdz_min = 0
 stdz_max = max(stdz_data)
 #position plots
 xmin = copy['xp[i]'].min()
 xmax = copy['xp[i]'].max()
 zmin = copy['zp[i]'].min()
 zmax = copy['zp[i]'].max()
-
 #Will do x-statstics first
 fig = plt.figure(figsize = (9,9))
 xax = plt.subplot2grid((3,3), (0,0), colspan = 2)
@@ -152,8 +151,8 @@ plt.tight_layout()
 #--Movie Creation
 
 #Initialize empty scattery for trajectory and line plot for RMS visualization
-scat = xax.scatter([], [], s = .1, c = 'k')       #Empty scatter plot for r values
-com_scat = xax.scatter([], [], s=2, c = 'r')      #Empty scatter plot for com values
+scat = xax.scatter([], [], s = .1, )       #Empty scatter plot for r values
+com_scat = xax.scatter([], [], s = 1.3, c = 'r')      #Empty scatter plot for com values
 line, = stdxax.plot([], [], lw = 1, c = 'k')      #Empty line plot for stdx vs z
 std_time_line, = stdxtax.plot([], [], lw = 1, c = 'k')  #Empty line plot for stdx vs time
 
@@ -161,7 +160,7 @@ std_time_line, = stdxtax.plot([], [], lw = 1, c = 'k')  #Empty line plot for std
 lstpart_text = data_table.text(0.05, 0.80, "", transform=data_table.transAxes)
 time_text = data_table.text(0.05, 0.75, "", transform=data_table.transAxes)
 #Create templates for data
-lstpart_template = 'Particles Lost = {:.2f}%'
+lstpart_template = 'Particles Lost = {:.2f}% of {} particles'
 time_template = 'Time = %f [ms]'
 
 
@@ -178,9 +177,18 @@ def init():
     return scat, com_scat, line, std_time_line, lstpart_text, time_text
 
 #Animation function. This will update the scatterplot coordinates for the ith frame.
+sign_list = np.sign(tracked_data['uzp[i]']) #A sign list used later to switch colors of particle rays
+sign_list = np.append(sign_list, 1) #append dummy value to end to prevent animate function error. 
 def animate(i):
-
+    #Color switching wont work like this for ray tracing since the entire trajectory is replotted. 
+    #if sign_list[i] != sign_list[i+1]:
+        #scat.set_color('m')
+   # else:
+        #scat.set_color('k')
     print(i) #useful to see how fast the program is running and when it will finish.
+    
+    #Create a color switching routine
+    
 
     #--Particle data points
     sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #Select data from dataframe from 0 to ith iteration
@@ -192,8 +200,8 @@ def animate(i):
     com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates from 0 to ither iteration
 
     #--Stdx_points for line plot
-    stdx_zpoints =com_zpoint
-    stdx_points = np.array(stdz_data[0:i])/mm #x_rms from 0 to ith iteration
+    stdx_zpoints = com_zpoint
+    stdx_xpoints = np.array(stdx_data[0:i])/mm #x_rms from 0 to ith iteration
 
     #Lost Particle value
     Nplost = tracked_data['Nplost'][i]
@@ -217,10 +225,10 @@ def animate(i):
     scat.set_offsets(scat_plot_points) #Scatter plot of x vs z
     com_scat.set_offsets(com_scat_point) # center of mass points
 
-    line.set_data(stdx_zpoints, stdx_points) #std_r line plot
-    std_time_line.set_data(time_points, stdx_points) #std_r time plot
+    line.set_data(com_zpoint, stdx_xpoints) #std_r line plot
+    std_time_line.set_data(time_points, stdx_xpoints) #std_r time plot
 
-    lstpart_text.set_text(lstpart_template.format(Nplost_point))
+    lstpart_text.set_text(lstpart_template.format(Nplost_point, Np))
     time_text.set_text(time_template % time_point)
 
     #Update plots

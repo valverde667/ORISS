@@ -8,7 +8,8 @@ setup()  # setup graphics etc.
 w3d.xmmax =   80.*mm # Upper limit of mesh r_max
 w3d.xmmin =    0. # Lower limit of mesh r_min (should be zero for r-z)
 #w3d.nx    =   4096. # Mesh points are 0,...,nx
-w3d.nx    = 1024      ### less fine mesh
+w3d.nx = 2560
+#w3d.nx    = 1024      ### less fine mesh
 
 # y-mesh (do not define in r-z simulations)
 #w3d.ymmax =   +.1 # Upper limit of mesh
@@ -16,10 +17,11 @@ w3d.nx    = 1024      ### less fine mesh
 #w3d.ny    =   128 # Mesh points are 0,...,ny
 
 # z-mesh
-w3d.zmmax =   +650.*mm # Upper limit of mesh
-w3d.zmmin =   -650.*mm # Lower limit of mesh
+w3d.zmmax =   +680.*mm # Upper limit of mesh
+w3d.zmmin =   -680.*mm # Lower limit of mesh
 #w3d.nz    =   4096 # Mesh points are 0,...,nz
-w3d.nz    = 1024   ### less fine
+w3d.nz  = 2560
+#w3d.nz    = 1024   ### less fine
 
 
 ####################################################################
@@ -68,10 +70,13 @@ RmaxIF = 61.*mm # Outer radius of interface (portion between cone and drift)
 length = 27.98*mm #length of annulus
 lengthIF = 43.05*mm #length of chamber between cone and drit
 cone = 44.99*mm #Radius of Cone segment
-wall_length = 18.6*mm #length of wall after last ring
+wall_length = length/3 #1/4 length of potential rings
+end_cyl_length = 2*length #twice the length of potential rings
+
 drift = 430.68*mm
 
 # Voltages of rings and cone number from left to right on rings from end
+ground = 0. #ground voltage
 Vcone = 0. #Voltage for cones
 V00   = 0. #Voltage for drift region and interface annulus
 V01   = 0. #Voltages for annulus 1-8 below
@@ -82,9 +87,11 @@ V05   = 0.
 V06   = 0.
 V07   = 0.
 V08   = 8.*kV
+Vcap  = 8.*kV
 
 #--Distances to object centers measured from midpoint of ORISS
-# z-centers of right rings
+#z-centers of right rings
+#end_cyl_centr = drift/2. + lengthIF + gap + 2*cone + 8*gap + 8*length + wall_length + end_cyl_length/2
 zwallcentr = drift/2. + lengthIF + gap + 2*cone + 8*gap + 8*length + wall_length/2
 zcentr8 = drift/2. + lengthIF + gap + 2*cone + 8*gap + 7*length + length/2.
 zcentr7 = drift/2. + lengthIF + gap + 2*cone + 7*gap + 6*length + length/2.
@@ -94,17 +101,22 @@ zcentr4 = drift/2. + lengthIF + gap + 2*cone + 4*gap + 3*length + length/2.
 zcentr3 = drift/2. + lengthIF + gap + 2*cone + 3*gap + 2*length + length/2.
 zcentr2 = drift/2. + lengthIF + gap + 2*cone + 2*gap + 1*length + length/2.
 zcentr1 = drift/2. + lengthIF + gap + 2*cone + 1*gap + 0*length + length/2.
-print(zwallcentr + wall_length/2)
-raise Exception()
-#--z-center of right cone
+
+
+#z-center of right cone
 zcentrcone = drift/2. + lengthIF + gap + cone
 
-#--Central pipe segment
+#Central pipe segment
 zcentrIF = drift/2. + lengthIF/2.
 zcentdrift = 0. #The origin
 
-#--Create Annlus conductors
-zrwall=ZAnnulus(rmin=entry_radius, rmax=Rmax, length=wall_length, voltage=0., zcent=zwallcentr)
+#Create Conductors 
+#Create Annlus conductors
+zrend_cyl=ZCylinder(radius=entry_radius, voltage=ground, 
+                    zlower = zwallcentr + wall_length/2,
+                    zupper = zwallcentr + wall_length/2 + end_cyl_length)
+#zrend_cyl=ZCylinder(radius=rend_cyl, length=wall_length, voltage=ground, zcent=end_cyl_centr)
+zrwall=ZAnnulus(rmin=entry_radius, rmax=Rmax, length=wall_length, voltage=V08, zcent=zwallcentr)
 zr8=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=zcentr8)
 zrcap = zrwall + zr8 #Combine last annulus with wall to creat one conductor
 zr7=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V07,zcent=zcentr7)
@@ -115,19 +127,19 @@ zr3=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V03,zcent=zcentr3)
 zr2=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V02,zcent=zcentr2)
 zr1=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V01,zcent=zcentr1)
 
-#--Create cone conductor
+#Create cone conductor
 hrcone = ZSrfrv(rsrf=rsrf,zsrf=zsrf,voltage=Vcone,zcent=zcentrcone)
 
-#--Create interface annulus conductor on right side
+#Create interface annulus conductor on right side
 zr0 = ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=lengthIF,voltage=V00,zcent=zcentrIF)
 
-#--Create drift conductor
+#Create drift conductor
 zdrift = ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=drift,voltage=V00,zcent=zcentdrift)
 
-#--Create left Cone
+#Create left Cone
 hlcone = ZSrfrv(rsrf=rsrf,zsrf=zsrf,voltage=Vcone,zcent=-zcentrcone)
 
-#--Create Left interface annulus
+#Create Left interface annulus
 zl0 = ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=lengthIF,voltage=V00,zcent=-zcentrIF)
 
 #--Create Conductors for left side of device (symmetric so just replace zcent with negative values of right side)
@@ -139,9 +151,14 @@ zl5=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V05,zcent=-zcentr5)
 zl6=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V06,zcent=-zcentr6)
 zl7=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V07,zcent=-zcentr7)
 zl8=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=-zcentr8)
-zlwall=ZAnnulus(rmin=entry_radius, rmax=Rmax,length=wall_length, voltage=0., zcent=-zwallcentr)
+zlwall=ZAnnulus(rmin=entry_radius, rmax=Rmax,length=wall_length, voltage=V08, zcent=-zwallcentr)
 zlcap = zl8 + zlwall #Create left cap conductor by combing wall and annulus
+#zlend_cyl = ZCylinder(radius=rend_cyl, length=wall_length, voltage=ground, zcent=-end_cyl_centr)
+zlend_cyl=ZCylinder(radius=entry_radius, voltage=ground, 
+                    zlower = -zwallcentr - wall_length/2 - end_cyl_length,
+                    zupper = -zwallcentr - wall_length/2)
 #--Install conductors on mesh.  These are placed with subgrid precision
+installconductor(zrend_cyl)
 installconductor(zrcap)
 installconductor(zr7)
 installconductor(zr6)
@@ -163,3 +180,4 @@ installconductor(zl5)
 installconductor(zl6)
 installconductor(zl7)
 installconductor(zlcap)
+installconductor(zlend_cyl)

@@ -12,7 +12,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.animation as animation
 
-file_save = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Animations/Simple_Dist/On_E/'
+file_save = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Animations/Simple_Dist/'
 
 #Some useful defintions.
 mm = 1e-3
@@ -22,7 +22,7 @@ kV = 1000.
 
 #--Read in variables and assign values from parameters.txt.
 #Variables that are in the parameters.txt file
-variable_list = ["particle_energy", "mass", "time_step", "Np_initial", "zcentr8", "zcentr7", \
+variable_list = ["particle_energy", "mass", "time_step","zcentr8", "zcentr7", \
                     "zcentr6", "zcentr5", "zcentr4", "zcentr3", "zcentr2", "zcentr1"]
 
 #Read in values and assign to variables.
@@ -98,14 +98,14 @@ xcom_coords = xcom_coords
 #Set min and max values for plots
 #std plots
 stdx_min = 0
-stdx_max = (1+.1)*max(stdx_data)
+stdx_max = (1+.05)*max(stdx_data)
 stdz_min = 0
-stdz_max = max(stdz_data)
+stdz_max = (1+.05)*max(stdz_data)
 #position plots
-xmin = copy['xp[i]'].min()
-xmax = copy['xp[i]'].max()
-zmin = copy['zp[i]'].min()
-zmax = copy['zp[i]'].max()
+xmin = (1+.05)*copy['xp[i]'].min()
+xmax = (1+.05)*copy['xp[i]'].max()
+zmin = (1+.05)*copy['zp[i]'].min()
+zmax = (1+.05)*copy['zp[i]'].max()
 #Will do x-statstics first
 fig = plt.figure(figsize = (9,9))
 xax = plt.subplot2grid((3,3), (0,0), colspan = 2)
@@ -114,9 +114,9 @@ stdxtax = plt.subplot2grid((3,3), (2,0), colspan = 3)
 
 data_table = plt.subplot2grid((3,3),(0,2), rowspan = 2) #Display data during animation
 data_table.set_title("Data Table")
-data_table.text(.05, .95, 'Position: 200 Particles/50mm Reflected', fontsize = 10)
+data_table.text(.05, .95, 'Simple Tuning Distribution', fontsize = 10)
 data_table.text(.05, .90, 'Velocity: No Distribution', fontsize = 10)
-data_table.text(.05, .85, 'Particle Energy = {:.2f} [kV]'.format(particle_energy/1000), fontsize = 10)
+data_table.text(.05, .85, 'Particle Energy = {:.7f} [kV]'.format(particle_energy/1000), fontsize = 10)
 
 data_table.spines['right'].set_visible(False)         #Turn off right spine
 data_table.yaxis.set_major_locator(plt.NullLocator()) #Turn off tick marks in y
@@ -152,7 +152,7 @@ plt.tight_layout()
 
 #Initialize empty scattery for trajectory and line plot for RMS visualization
 scat = xax.scatter([], [], s = .1, )       #Empty scatter plot for r values
-com_scat = xax.scatter([], [], s = 1.3, c = 'r')      #Empty scatter plot for com values
+com_scat = xax.scatter([], [], s = .2, c = 'r')      #Empty scatter plot for com values
 line, = stdxax.plot([], [], lw = 1, c = 'k')      #Empty line plot for stdx vs z
 std_time_line, = stdxtax.plot([], [], lw = 1, c = 'k')  #Empty line plot for stdx vs time
 
@@ -160,7 +160,7 @@ std_time_line, = stdxtax.plot([], [], lw = 1, c = 'k')  #Empty line plot for std
 lstpart_text = data_table.text(0.05, 0.80, "", transform=data_table.transAxes)
 time_text = data_table.text(0.05, 0.75, "", transform=data_table.transAxes)
 #Create templates for data
-lstpart_template = 'Particles Lost = {:.2f}% of {} particles'
+lstpart_template = 'Particles Lost = {:.2f}% ({}/{})'
 time_template = 'Time = %f [ms]'
 
 
@@ -191,13 +191,16 @@ def animate(i):
     
 
     #--Particle data points
-    sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #Select data from dataframe from 0 to ith iteration
+    #sample = copy[copy['Iter'] == i] #For particle only plotting
+    sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #For ray Tracing
     xpoints = sample['xp[i]']/mm     #x-coordinates for all particles from 0 to ith iteration
     zpoints = sample['zp[i]']/mm     #z-coordinates for all particles from 0 to ith iteration
 
     #--Center of Mass Calculations
-    com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates from 0 to ith iteration
-    com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates from 0 to ither iteration
+    #com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting 
+    #com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
+    com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing 
+    com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing 
 
     #--Stdx_points for line plot
     stdx_zpoints = com_zpoint
@@ -218,7 +221,8 @@ def animate(i):
     #It is important to note tha set_offsets takes in (N,2) arrays. This is the reasoning for
     #adding np.newaxis the command. These arrays are then ((x,y), newaxis).
     scat_plot_points = np.hstack((zpoints[:, np.newaxis], xpoints[:, np.newaxis]))
-    com_scat_point = np.hstack((com_zpoint[:, np.newaxis], com_xpoint[:, np.newaxis]))
+    #com_scat_point = np.hstack((com_zpoint[:,np.newaxis], com_xpoint[:,np.newaxis])) #Particle plotting 
+    com_scat_point = np.hstack((com_zpoint[:, np.newaxis], com_xpoint[:, np.newaxis])) #ray tracing 
 
 
     #Enter in new plot points.
@@ -228,7 +232,7 @@ def animate(i):
     line.set_data(com_zpoint, stdx_xpoints) #std_r line plot
     std_time_line.set_data(time_points, stdx_xpoints) #std_r time plot
 
-    lstpart_text.set_text(lstpart_template.format(Nplost_point, Np))
+    lstpart_text.set_text(lstpart_template.format(Nplost_point, Nplost, Np))
     time_text.set_text(time_template % time_point)
 
     #Update plots
@@ -246,4 +250,4 @@ writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800) #Some video se
 #by only plotting the changes rather then replotting each frame.
 ani = animation.FuncAnimation(fig, animate, frames=num_of_frames-1, interval=200, repeat=True, blit = True) #The actual animator
 plt.show()
-ani.save(file_save + 'run.mp4', writer=writer)
+ani.save(file_save + 'E{}run.mp4'.format(particle_energy/kV), writer=writer)

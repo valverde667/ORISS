@@ -27,7 +27,7 @@ setup()  # setup graphics etc.
 ####################################################################
 
 # x-mesh (radial in r-z)
-w3d.xmmax =   +.1 # Upper limit of mesh r_max
+w3d.xmmax =   80.*mm # Upper limit of mesh r_max
 w3d.xmmin =    0. # Lower limit of mesh r_min (should be zero for r-z)
 #w3d.nx    =   4096. # Mesh points are 0,...,nx
 w3d.nx    = 1024      ### less fine mesh
@@ -38,8 +38,8 @@ w3d.nx    = 1024      ### less fine mesh
 #w3d.ny    =   128 # Mesh points are 0,...,ny
 
 # z-mesh
-w3d.zmmax =   +1. # Upper limit of mesh
-w3d.zmmin =   -1. # Lower limit of mesh
+w3d.zmmax =   +650.*mm # Upper limit of mesh
+w3d.zmmin =   -650.*mm # Lower limit of mesh
 #w3d.nz    =   4096 # Mesh points are 0,...,nz
 w3d.nz    = 1024   ### less fine
 

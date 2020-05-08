@@ -134,11 +134,11 @@ vx_list = np.array(vx_list)
 vy_list = np.array(vy_list)
 vz_list = np.array(vz_list)
 
-#Filestring is useful for saving images. 
-filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnostics/Distribution' 
+#Filestring is useful for saving images.
+dist_filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnostics/Distribution/'
 
 #-- Create figure for each dist plot and plot.
-#  It is import to create a separate figure for each or else data will mix into 
+#  It is import to create a separate figure for each or else data will mix into
 #  other plots.
 xzplot = plt.figure(1)
 plt.scatter(zpos_list/mm,xpos_list/mm, s = .5)
@@ -146,7 +146,7 @@ plt.title('x-z', fontsize = 16)
 plt.xlabel("z[mm]", fontsize = 14)
 plt.ylabel("x[mm]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'x-z.png', dpi=300)
+plt.savefig(dist_filestring + 'x-z.png', dpi=300)
 
 
 yzplot = plt.figure(2)
@@ -155,7 +155,7 @@ plt.title('y-z', fontsize = 16)
 plt.xlabel("z[mm]", fontsize = 14)
 plt.ylabel("y[mm]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'y-z.png', dpi=300)
+plt.savefig(dist_filestring + 'y-z.png', dpi=300)
 
 
 xyplot = plt.figure(3)
@@ -164,7 +164,7 @@ plt.title('x-y', fontsize = 16)
 plt.xlabel("x[mm]", fontsize = 14)
 plt.ylabel("y[mm]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'y-x.png', dpi=300)
+plt.savefig(dist_filestring + 'y-x.png', dpi=300)
 
 
 rzplot = plt.figure(4)
@@ -174,7 +174,7 @@ plt.title('r-z', fontsize = 16)
 plt.xlabel("z[mm]", fontsize = 14)
 plt.ylabel("r[mm]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'r-z.png', dpi=300)
+plt.savefig(dist_filestring + 'r-z.png', dpi=300)
 
 
 vxxplot = plt.figure(5)
@@ -183,7 +183,7 @@ plt.title('vx-x', fontsize = 16)
 plt.xlabel("x [m]", fontsize = 14)
 plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'vx-x.png', dpi=300)
+plt.savefig(dist_filestring + 'vx-x.png', dpi=300)
 
 
 vyyplot = plt.figure(6)
@@ -192,7 +192,7 @@ plt.title('vy-y', fontsize = 16)
 plt.xlabel("y[mm]", fontsize = 14)
 plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'vy-y.png', dpi=300)
+plt.savefig(dist_filestring + 'vy-y.png', dpi=300)
 
 
 vzzplot = plt.figure(7)
@@ -201,7 +201,7 @@ plt.title('vz-z', fontsize = 16)
 plt.xlabel("z[mm]", fontsize = 14)
 plt.ylabel(r"$v_z$[m/s]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'vz-z.png', dpi=300)
+plt.savefig(dist_filestring + 'vz-z.png', dpi=300)
 
 
 vzvxplot = plt.figure(8)
@@ -210,7 +210,7 @@ plt.title('vx-vz', fontsize = 16)
 plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
 plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'vx-vz.png', dpi=300)
+plt.savefig(dist_filestring + 'vx-vz.png', dpi=300)
 
 
 vzvyplot = plt.figure(9)
@@ -219,7 +219,7 @@ plt.title('vy-vz', fontsize = 16)
 plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
 plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'vy-vz.png', dpi=300)
+plt.savefig(dist_filestring + 'vy-vz.png', dpi=300)
 
 
 vxvyplot = plt.figure(10)
@@ -228,7 +228,7 @@ plt.title('vy-vx', fontsize = 16)
 plt.xlabel(r"$v_x$[m/s]", fontsize = 14)
 plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
 plt.tight_layout()
-plt.savefig(filestring + 'vy-vx.png', dpi=300)
+plt.savefig(dist_filestring + 'vy-vx.png', dpi=300)
 plt.show()
 # ============================================================================
 
@@ -236,8 +236,8 @@ plt.show()
 # Setup Diagnostics and make initial diagnostic plots
 #
 
-diagnostic_filestring  = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnostics/Fields'
-#--Plot Fields 
+field_diagonstic_file_string = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnostics/Fields/'
+#--Plot Fields
 fig, axes = plt.subplots(nrows = 2, ncols = 1, sharex = True, figsize = (7,7))
 
 #Electric Potential
@@ -247,7 +247,7 @@ ax1.axhline(y=particle_energy/kV, color = 'r', linestyle = '--', label = 'Initia
 ax1.set_title('Initial Potential on Axis vs z ')
 ax1.set_ylabel('Potential (KV)')
 ax1.legend()
-    
+
 #Electric Field
 ax2.plot(z,np.gradient(getphi(ix=0)), label = 'Transverse Field Gradient')
 ax2.axhline(y = 0, color = 'k', lw = .5)
@@ -256,7 +256,7 @@ ax2.set_xlabel('Longitudinal Position (m)')
 ax2.legend()
 
 plt.tight_layout()
-plt.savefig(diagnostic_filestring + 'on-axis_E-V_fields.png', dpi=300)
+plt.savefig(diagnostic_filestring + 'Fields_on-axis.png', dpi=300)
 
 
 #--Contour Plot

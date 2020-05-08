@@ -19,7 +19,7 @@ print("--- %s seconds ---" % (time.time() - start_time))
 # Simulation Mesh, create in w3d but run field solve in r-z
 ####################################################################
 
-exec(open("ORISS_Geometry.py").read()) #Create simulation mesh
+exec(open("ORISS_Geometry_V1.py").read()) #Create simulation mesh
 
 
 
@@ -203,7 +203,7 @@ p = MyParticle(particle_energy, uranium_beam)
 for xpos in xcoord:
     load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
     avg_coordinates = (xpos, 0, 0)))
-        
+
     load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
     avg_coordinates = (-xpos, 0, 0)))
 
@@ -220,7 +220,7 @@ tracked_uranium =  Species(type=Uranium,charge_state=+1,name="Beam species",weig
 tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_beam.mass))
 
 
-#top.prwall = 25*mm #Could not get to work. Loaded particles well out of 25mm and they survived. 
+#top.prwall = 25*mm #Could not get to work. Loaded particles well out of 25mm and they survived.
 aperture_radius = 25*mm
 def scrapebeam():
     rsq = uranium_beam.xp**2 + uranium_beam.yp**2
@@ -241,7 +241,7 @@ top.lsavelostpart = 1
 #  Make nice initial field diagnostic plots with labels.  Make plots of:
 #   1) phi(r=0,z) vs z in volts
 #   1a) repeat 1) and put the inital bunch energy on in units of volts
-
+field_diagonstic_file_string = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagonstics/Fields/'
 fig, axes = plt.subplots(nrows = 2, ncols = 1, sharex = True, figsize = (7,7))
 
 ax1, ax2 = axes[0], axes[1]
@@ -260,11 +260,17 @@ ax2.set_xlabel('Longitudinal Position (m)')
 ax2.legend()
 
 plt.tight_layout()
-plt.savefig('/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/initial_potential.png', dpi=300)
+plt.savefig(field_diagonstic_file_string + 'Fields_on-axis.png', dpi=300)
 
 ####################################################################
+#--Plot fields with warp
+# winon() #Turn on window graphic
+# pfzr(plotphi=1, plotselfe=0 , comp = 'x') #plot phi or E. Comp= component to plot
+# limits(min(w3d.zmesh),max(w3d.zmesh), min(w3d.xmesh),max(w3d.xmesh))
+# fma() #clear frame and send to cgm file.
 
 
+raise Exception()
 
 ####################################################################
 # Generate Output files for post-process
@@ -280,9 +286,9 @@ trackedfile = open("tracked_particle.txt", "w")
 #Columns Particle, Iter, zp[i], uzp[i], xp[i], uxp[i]
 
 #Test moment calculator in Warp
-top.ifzmmnt = 1 #Specifies global z moment calculates 
-top.lspeciesmoments = True #Calcluates moment for each species separately and combined. 
-top.lhist = True #saves histories for moment calculations 
+top.ifzmmnt = 1 #Specifies global z moment calculates
+top.lspeciesmoments = True #Calcluates moment for each species separately and combined.
+top.lhist = True #saves histories for moment calculations
 
 
 for i in range(0,uranium_beam.getz().size):
@@ -293,14 +299,14 @@ for i in range(0,uranium_beam.getz().size):
 
 #Columns Iter, zp[i], uzp[i], xp[i], uxp[i], # lost particles
 trackedfile.write('{},{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], tracked_uranium.getvz()[0],
-                                                    tracked_uranium.getx()[0], tracked_uranium.getvx()[0], 
+                                                    tracked_uranium.getx()[0], tracked_uranium.getvx()[0],
                                                     len(uranium_beam.getx(lost=1))) + "\n")
 
 bounce_count = 0
 iteration = 0
 while bounce_count <= 2:
 #while iteration < 10:
-    
+
     step(1)  # advance particles
     sign_list = np.sign(tracked_uranium.getvz())
 

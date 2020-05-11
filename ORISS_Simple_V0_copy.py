@@ -55,14 +55,11 @@ top.lbeamcom = False # Specify grid does not move to follow beam center of mass 
 package("w3d") # Specify 3D code.  But fieldsolver will be r-z and particles will deposit on r-z mesh
 generate()     # Initate code, this will also make an initial fieldsolve
 
-
-
 solver.ldosolve = False #This sets up the field solver with the beam fields.
                      #particles are treated as interacting. False, turns off space charge
-limits(-1.,1.)
-z = linspace(-1.,1.,w3d.nz+1)
+z = w3d.zmesh
 
-particle_energy = .825*kV #Somehwere between .82 and .83
+particle_energy = 4.8060*kV
 
 # load_list = []
 # p = MyParticle(particle_energy, uranium_beam) #Create particle instance
@@ -77,8 +74,8 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 
 #--Load particles onto beam
-xcoord = [(i)*mm/10 for i in range(70)] #6mm Threshold for no particles lost
-xcoord = np.arange(0,6,1)*mm
+#xcoord = [(i)*mm/10 for i in range(70)] #6mm Threshold for no particles lost
+xcoord = np.arange(0,20,1)*mm
 load_list = []
 p = MyParticle(particle_energy, uranium_beam)
 
@@ -86,8 +83,8 @@ for xpos in xcoord:
     load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
     avg_coordinates = (xpos, 0, 0)))
 
-    load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
-    avg_coordinates = (-xpos, 0, 0)))
+    #load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
+    #avg_coordinates = (-xpos, 0, 0)))
 
 
 for array in load_list:
@@ -130,84 +127,84 @@ field_diagnostic_file_string = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_
 beam_index = int(25*mm*w3d.nx/w3d.xmmax) #index for slicing arrays to r = 25mm
 
 #--Field Line Plots
-fig, axes = plt.subplots(nrows = 2, ncols = 1, sharex = True, figsize = (7,7))
-Er, Ez = np.gradient(getphi()) #Compute Electric field Components
+Er, Ez = getselfe(comp='x'), getselfe(comp='z') #Grab E fields from warp
 
+#Create plots
+fig, axes = plt.subplots(nrows = 3, ncols = 1, sharex = True, figsize = (7,7))
+phi_plot, Ezplot, Erplot = axes[0], axes[1], axes[2]
 
-phi_plot, Eplot = axes[0], axes[1]
-phi_plot.plot(z, getphi(ix=0)/kV, label = r'$\Phi(z,r=0)$')
-phi_plot.axhline(y=particle_energy/kV, color = 'r', linestyle = '--', label = 'Initial Particle Energy')
-phi_plot.set_title('Initial Electric Potential on Axis', fontsize = 16)
-phi_plot.set_ylabel('Potential (KV)', fontsize = 14)
+#phi plotting
+phi_plot.plot(z, getphi(ix=0)/kV, lw=1, label = r'$\Phi(z,r=0)$ [kV/m]')
+phi_plot.axhline(y=particle_energy/kV, c='r', linestyle = '--', lw=.75,
+                 label='Initial Particle Energy {:.3f} [kV]'.format(particle_energy/kV))
+phi_plot.axhline(y=max(getphi(ix=0))/kV, c='b', linestyle='--', lw=.75,
+                 label='Max Potential {:.3f} [kV]'.format(max(getphi(ix=0))/kV))
+phi_plot.legend(fontsize=10)
 
+phi_plot.set_title('Initial Electric Potential on Axis', fontsize=16)
+phi_plot.set_ylabel('Potential (KV)', fontsize=10)
+
+#Electric field plotting
 Ezr0 = Ez[0] #E_z at a r = 0
-Erz0 = Er[0] #E_r at r = 0
-Eplot.plot(z, Ezr0/kV, label = r'$E_z(z,r=0)$ [kV/m]')
-Eplot.plot(z, Erz0/kV, label = r'$E_r(z, r=0)$ [kV/m]')
+Err0 = Er[1]/w3d.xmesh[1] #E_r/r two step sizes away from axis
 
-Eplot.set_title("Intial Electric Field on Axis", fontsize = 16)
-Eplot.set_xlabel('z[m]', fontsize = 14)
-Eplot.set_ylabel('Electric Field [kV/m]', fontsize = 14)
+Ezplot.plot(z, Ezr0/kV, c='m', lw=1, label=r'$E_z(z,r=0)$ [kV/$m^2$]')
+Ezplot.axhline(y=0, c='k', lw=.5)
+
+Erplot.plot(z, Err0/kV, c='m', lw=1, label=r'$\frac{E_r(z,r)}{r}|_{\approx0}$ [kV/$m^3$]')
+Erplot.axhline(y=0, c='k', lw=.5)
+
+#Set Labels
+Ezplot.set_title(r"Intial $E_z$ on Axis", fontsize=16)
+Ezplot.set_ylabel(r'Electric Field [kV/$m^2$]', fontsize=10)
+Ezplot.legend(loc='upper center')
+
+Erplot.set_title(r"Initial $E_r/r$ on Axis", fontsize=16)
+Erplot.set_xlabel('z[m]', fontsize=12)
+Erplot.set_ylabel(r'Scaled Electric Field [kV/$m^3$]', fontsize=10)
+Erplot.legend(loc='upper center')
+
 plt.legend()
 plt.tight_layout()
 plt.savefig(field_diagnostic_file_string + 'Fields_on-axis.png', dpi=300)
 
 
-#--Global Field Contour Plots
-fig,axes = plt.subplots(nrows = 2, ncols = 1, sharex = True, figsize=(8,8))
-phiax = axes[0]
-Eax = axes[1]
-phiax.set_title('Electric Potential Contours in r-z', fontsize = 16)
-phiax.set_ylabel('r [m]', fontsize = 14)
-phicnt = phiax.contour(w3d.zmesh, w3d.xmesh, getphi(), cmap=cm.hsv, linewidths = .7)
-phicb = fig.colorbar(phicnt, shrink= 0.8, ax = phiax, label = r'$\Phi(z,r)$ [kV]')
-
-#p = ax.pcolor(w3d.zmesh/mm, w3d.xmesh/mm, getphi(), cmap=cm.gray, vmin=abs(getphi()).min(), vmax=abs(getphi()).max())
-#cb = fig.colorbar(p, shrink = 0.8, ax=ax)
-
-
-Ezcnt = Eax.contour(w3d.zmesh, w3d.xmesh, Ez/kV, cmap = cm.hsv, linewidths = .7)
-Ecb = fig.colorbar(Ezcnt, shrink = 0.8, ax = Eax, label = r'$E_z(z,r)$ [kV/m]')
-
-Eax.set_title("On-axis Electric Field Contours", fontsize = 16)
-Eax.set_xlabel('z [m]', fontsize = 14)
-Eax.set_ylabel('r [m]', fontsize = 14)
-
-#l, b, w, h = ax.get_position().bounds
-#-Adjust gray color bar
-#ll, bb, ww, hh = cb.ax.get_position().bounds
-#cb.ax.set_position([ll, b + 0.1*h, ww, h*0.8])
-
-plt.tight_layout()
-plt.show()
-plt.savefig(field_diagnostic_file_string + 'global_contour_E-V_fields.png', dpi=400)
-
-#--Local Field Contour Plots
+#--Global/Local Field Contour Plots
+numcntrs = 25 #Set number of contour lines.
+#Get local data points
 phi_local =  getphi()[0:beam_index,0:int(w3d.nz/2)+1]
-#levels = np.linspace(0, phi_local.max()/kV, 101)
-levels = np.linspace(0, .7, 101)
-fig,axes = plt.subplots(nrows = 2, ncols = 1, figsize =(8,8), sharex=True)
+zlocal = w3d.zmesh[0:int(w3d.nz/2)+1]
+rlocal = w3d.xmesh[0:beam_index]
+
+#Create plot
+fig,axes = plt.subplots(nrows = 2, ncols = 1, figsize=(8,8))
 phiax = axes[0]
-Ezax = axes[1]
-phiax.set_title('Electric Potential Contours in r-z', fontsize = 16)
-phiax.set_ylabel('r[mm]', fontsize = 14)
+philocalax = axes[1]
+
+#Plot Globals Field
+phicnt = phiax.contour(w3d.zmesh, w3d.xmesh, getphi()/kV,
+                       levels=numcntrs, cmap=cm.hsv, linewidths=.5)
+phicb = fig.colorbar(phicnt, shrink=0.8, ax=phiax, label=r'$\Phi(z,r)$ [kV]')
+
+phiax.set_title('Global Electric Potential in r-z', fontsize=16)
+phiax.set_xlabel('z[m]', fontsize=14)
+phiax.set_ylabel('r[m]', fontsize=14)
+
+
+#Plot local field
+locallvls = np.arange(0, max(phi_local[0])/kV, .25)
+philocalcnt = philocalax.contour(zlocal, rlocal, phi_local/kV,
+                    levels=locallvls, cmap=cm.hsv, linewidths=.5)
+philocalcb= fig.colorbar(philocalcnt, shrink=0.8, ax=philocalax,
+                         label=r'$\Phi(z,r)$ [kV]')
+
+philocalax.set_title("Local Electric Potential in r-z", fontsize=16)
+philocalax.set_xlabel('z [m]', fontsize=14)
+philocalax.set_ylabel('r [m]', fontsize=14)
+
 #p = ax.pcolor(w3d.zmesh/mm, w3d.xmesh/mm, getphi(), cmap=cm.gray, vmin=abs(getphi()).min(), vmax=abs(getphi()).max())
 #cb = fig.colorbar(p, shrink = 0.8, ax=ax)
 
-#Plot contour for r = [0:25mm] and z = [-650mm:0]
-Ez_local = np.gradient(getphi()[0:beam_index,0:int(w3d.nz/2)+1])[1]
-
-phicnt = phiax.contour(w3d.zmesh[0:int(w3d.nz/2)+1], w3d.xmesh[0:beam_index],  getphi()[0:beam_index,0:int(w3d.nz/2)+1], levels = levels,
-                 cmap=cm.hsv, linewidths = .7)
-phicb = fig.colorbar(phicnt, shrink= 0.8, ax = phiax, label = r'$\Phi(z,r)$ [kV]')
-
-Ezcnt = Ezax.contour(w3d.zmesh[0:int(w3d.nz/2)+1], w3d.xmesh[0:beam_index], Ez_local/kV,
-                     cmap=cm.hsv, linewidths = .7)
-Ezcb = fig.colorbar(Ezcnt, shrink = 0.8, ax = Ezax, label = r'$/Ez(r,z)$ [kV/m]')
-
-Ezax.set_xlabel('z[m]', fontsize = 14)
-Ezax.set_ylabel('r[m]', fontsize = 14)
-Ezax.set_title('Electric Field Contours in r-z', fontsize = 16)
 #l, b, w, h = ax.get_position().bounds
 #-Adjust gray color bar
 #ll, bb, ww, hh = cb.ax.get_position().bounds
@@ -215,15 +212,13 @@ Ezax.set_title('Electric Field Contours in r-z', fontsize = 16)
 
 plt.tight_layout()
 plt.show()
-plt.savefig(field_diagnostic_file_string + 'local_contour_E-V_fields.png', dpi=400)
-
+plt.savefig(field_diagnostic_file_string + 'potential_countours.png', dpi=400)
 
 #--Plot fields with warp
 # winon() #Turn on window graphic
 # pfzr(plotphi=1, plotselfe=0, contours = 50, cmin=0, cmax = 1000) #plot phi or E. Comp= component to plot
 # limits(min(w3d.zmesh),max(w3d.zmesh), min(w3d.xmesh),max(w3d.xmesh))
 # fma() #clear frame and send to cgm file.
-raise Exception()
 
 
 ####################################################################
@@ -250,9 +245,9 @@ parameterfile.close()
 #Columns Particle, Iter, zp[i], uzp[i], xp[i], uxp[i]
 
 #Test moment calculator in Warp
-top.ifzmmnt = 1 #Specifies global z moment calculates
-top.lspeciesmoments = True #Calcluates moment for each species separately and combined.
-top.lhist = True #saves histories for moment calculations
+#top.ifzmmnt = 1 #Specifies global z moment calculates
+#top.lspeciesmoments = True #Calcluates moment for each species separately and combined.
+#top.lhist = True #saves histories for moment calculations
 
 
 for i in range(0,uranium_beam.getz().size):

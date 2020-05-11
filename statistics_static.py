@@ -31,7 +31,7 @@ f.close()
 
 
 
-def geometry(axis):
+def plot_conductors(axis):
     ring_centers = [zcentr8, zcentr7, zcentr6, zcentr5, zcentr4, zcentr3, \
                           zcentr2, zcentr1, -zcentr8, -zcentr7, -zcentr6, -zcentr5, \
                           -zcentr4, -zcentr3, -zcentr2, -zcentr1]

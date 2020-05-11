@@ -116,7 +116,7 @@ data_table = plt.subplot2grid((3,3),(0,2), rowspan = 2) #Display data during ani
 data_table.set_title("Data Table")
 data_table.text(.05, .95, 'Simple Tuning Distribution', fontsize = 10)
 data_table.text(.05, .90, 'Velocity: No Distribution', fontsize = 10)
-data_table.text(.05, .85, 'Particle Energy = {:.7f} [kV]'.format(particle_energy/1000), fontsize = 10)
+data_table.text(.05, .85, 'Particle Energy = {:.4f} [kV]'.format(particle_energy/1000), fontsize = 10)
 
 data_table.spines['right'].set_visible(False)         #Turn off right spine
 data_table.yaxis.set_major_locator(plt.NullLocator()) #Turn off tick marks in y
@@ -248,6 +248,6 @@ Writer = animation.writers['ffmpeg'] #for saving purposes
 writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800) #Some video settings.
 #Ani is the actual animations. interval is interval between frames in microsecons. Blit is what speeds up the animation process
 #by only plotting the changes rather then replotting each frame.
-ani = animation.FuncAnimation(fig, animate, frames=num_of_frames-1, interval=200, repeat=True, blit = True) #The actual animator
+ani = animation.FuncAnimation(fig, animate, frames=num_of_frames-1, interval=200, repeat=False, blit = True) #The actual animator
 plt.show()
 ani.save(file_save + 'E{}run.mp4'.format(particle_energy/kV), writer=writer)

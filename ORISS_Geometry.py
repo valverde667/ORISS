@@ -5,11 +5,11 @@ setup()  # setup graphics etc.
 ####################################################################
 
 # x-mesh (radial in r-z)
-w3d.xmmax =   80.*mm # Upper limit of mesh r_max
+w3d.xmmax =   72.*mm # Upper limit of mesh r_max
 w3d.xmmin =    0. # Lower limit of mesh r_min (should be zero for r-z)
 #w3d.nx    =   4096. # Mesh points are 0,...,nx
-w3d.nx = 2560
-#w3d.nx    = 1024      ### less fine mesh
+#w3d.nx = 2560
+w3d.nx    = 1024      ### less fine mesh
 
 # y-mesh (do not define in r-z simulations)
 #w3d.ymmax =   +.1 # Upper limit of mesh
@@ -20,8 +20,8 @@ w3d.nx = 2560
 w3d.zmmax =   +680.*mm # Upper limit of mesh
 w3d.zmmin =   -680.*mm # Lower limit of mesh
 #w3d.nz    =   4096 # Mesh points are 0,...,nz
-w3d.nz  = 2560
-#w3d.nz    = 1024   ### less fine
+#w3d.nz  = 2560
+w3d.nz    = 1024   ### less fine
 
 
 ####################################################################
@@ -86,12 +86,12 @@ V04   = 0.
 V05   = 0.
 V06   = 0.
 V07   = 0.
-V08   = 8.*kV
-Vcap  = 8.*kV
+V08   = 10.*kV
+Vcap  = 10.*kV
 
 #--Distances to object centers measured from midpoint of ORISS
 #z-centers of right rings
-#end_cyl_centr = drift/2. + lengthIF + gap + 2*cone + 8*gap + 8*length + wall_length + end_cyl_length/2
+end_cyl_centr = drift/2. + lengthIF + gap + 2*cone + 8*gap + 8*length + wall_length + end_cyl_length/2
 zwallcentr = drift/2. + lengthIF + gap + 2*cone + 8*gap + 8*length + wall_length/2
 zcentr8 = drift/2. + lengthIF + gap + 2*cone + 8*gap + 7*length + length/2.
 zcentr7 = drift/2. + lengthIF + gap + 2*cone + 7*gap + 6*length + length/2.
@@ -112,10 +112,8 @@ zcentdrift = 0. #The origin
 
 #Create Conductors 
 #Create Annlus conductors
-zrend_cyl=ZCylinder(radius=entry_radius, voltage=ground, 
-                    zlower = zwallcentr + wall_length/2,
-                    zupper = zwallcentr + wall_length/2 + end_cyl_length)
-#zrend_cyl=ZCylinder(radius=rend_cyl, length=wall_length, voltage=ground, zcent=end_cyl_centr)
+zrend_cyl=ZAnnulus(rmin=entry_radius, rmax=entry_radius+10*mm, length=end_cyl_length,
+               voltage=ground, zcent=end_cyl_centr)
 zrwall=ZAnnulus(rmin=entry_radius, rmax=Rmax, length=wall_length, voltage=V08, zcent=zwallcentr)
 zr8=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=zcentr8)
 zrcap = zrwall + zr8 #Combine last annulus with wall to creat one conductor
@@ -153,10 +151,8 @@ zl7=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V07,zcent=-zcentr7)
 zl8=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=-zcentr8)
 zlwall=ZAnnulus(rmin=entry_radius, rmax=Rmax,length=wall_length, voltage=V08, zcent=-zwallcentr)
 zlcap = zl8 + zlwall #Create left cap conductor by combing wall and annulus
-#zlend_cyl = ZCylinder(radius=rend_cyl, length=wall_length, voltage=ground, zcent=-end_cyl_centr)
-zlend_cyl=ZCylinder(radius=entry_radius, voltage=ground, 
-                    zlower = -zwallcentr - wall_length/2 - end_cyl_length,
-                    zupper = -zwallcentr - wall_length/2)
+zlend_cyl=ZAnnulus(rmin=entry_radius, rmax=entry_radius+10*mm, length=end_cyl_length,
+               voltage=ground, zcent=-end_cyl_centr)
 #--Install conductors on mesh.  These are placed with subgrid precision
 installconductor(zrend_cyl)
 installconductor(zrcap)

@@ -86,8 +86,8 @@ V04   = 0.
 V05   = 0.
 V06   = 0.
 V07   = 0.
-V08   = 10.*kV
-Vcap  = 10.*kV
+V08   = 6.*kV
+Vcap  = 6.*kV
 
 #--Distances to object centers measured from midpoint of ORISS
 #z-centers of right rings

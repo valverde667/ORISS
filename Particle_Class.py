@@ -64,7 +64,8 @@ class MyParticle(object):
     def __init__(self, energy, beam):
         self.energy = energy
         self.beam = beam
-    def position(self, position_distribution, num_of_particles, sigma, avg_coordinates):
+    def position(self, position_distribution='gaussian', num_of_particles=1,
+                 sigma=(0.,0.,0.), avg_coordinates=(0.,0.,0.)):
         #Initialize sigma, avg coordinate, and average angles.
 
         #################### Guassian Routine ##############################
@@ -80,17 +81,15 @@ class MyParticle(object):
 
             #Gaussian routine for position
             counter = 0
-            position_array = [] #Initialize empty list to populate with positional arrays (x,y,z)
+            position_array = np.zeros([num_of_particles, 3], dtype = float) #Initialize empty list to populate with positional arrays (x,y,z)
             while counter < num_of_particles:
-                #Randomly generate positions
-                x = np.random.normal(X, sigmax)
-                y = np.random.normal(Y, sigmay)
-                z = np.random.normal(Z, sigmaz)
-                position_array.append((x,y,z)) #append positions to list
+                #Randomly generate positions and add to position array
+                position_array[counter][0] = np.random.normal(X, sigmax)
+                position_array[counter][1] = np.random.normal(Y, sigmay)
+                position_array[counter][2] = np.random.normal(Z, sigmaz)
 
                 counter += 1
 
-            position_array = np.array(position_array) #Turn list into an array
             return position_array
 
 
@@ -104,7 +103,8 @@ class MyParticle(object):
             return print("No distribution selected")
 
 
-    def velocity(self, velocity_distribution, num_of_particles, temperature, avg_velocities):
+    def velocity(self, velocity_distribution='gaussian', num_of_particles=1,
+                 temperature=(0.,0.), avg_velocities=(0.,0.)):
         #Unpack tuples and set variables
         mass = self.beam.mass
         energy = self.energy
@@ -120,16 +120,13 @@ class MyParticle(object):
 
             #Gaussian Algorithm to randomaly generate velocities
             counter = 0
-            velocity_array = []
+            velocity_array = np.zeros([num_of_particles, 3], dtype = float)
             while counter < num_of_particles:
-                vx = np.random.normal(Vx, sigma_transverse_velocity)
-                vy = np.random.normal(Vy, sigma_transverse_velocity)
-                vz = abs(np.random.normal(Vz, sigma_parallel_velocity))
-                velocity_array.append((vx,vy,vz))
+                velocity_array[counter][0] = np.random.normal(Vx, sigma_transverse_velocity)
+                velocity_array[counter][1] = np.random.normal(Vy, sigma_transverse_velocity)
+                velocity_array[counter][2] = abs(np.random.normal(Vz, sigma_parallel_velocity))
 
                 counter += 1
-
-            velocity_array = np.array(velocity_array)
 
             return velocity_array
 
@@ -147,43 +144,46 @@ class MyParticle(object):
 
 
 
-    def loader(self, position_distribution = 'gaussian', velocity_distribution = 'gaussian', num_of_particles=1, sigma = (0, 0, 0), temperature = (0, 0), avg_velocities = (0, 0),
-              avg_coordinates = (0, 0, 0)): #This function will return an array of (x, y, z, vx, vy, vz) that can be looped through to load onto a beam in warp.
+    def loader(self, position_distribution='gaussian', velocity_distribution='gaussian',
+               num_of_particles=1, sigma=(0, 0, 0), temperature=(0, 0),
+               avg_velocities=(0, 0), avg_coordinates=(0, 0, 0), dump=0): #This function will return an array of (x, y, z, vx, vy, vz) that can be looped through to load onto a beam in warp.
 
         position = self.position(position_distribution, num_of_particles, sigma, avg_coordinates)
         velocity = self.velocity(velocity_distribution, num_of_particles, temperature, avg_velocities)
-        load = np.concatenate((position,velocity),axis=1)
+        load = np.hstack((position,velocity))
 
         #--Data Output
         #Create Table function to call if sigma and temperature are given
-        def emittance_table(transverse_emittance, parallel_emittance, norm_transverse_emittance, norm_parallel_emittance):
-            print(40*"=")
-            print("Transverse emittance in mm-mrad = ", transverse_emittance/(mm*mm))
-            print("Parallel emittance in mm-mrad = ", parallel_emittance/(mm*mm))
-            print(40*'-')
-            print("Normalized Transverse emittance in mm-mrad = ", norm_transverse_emittance/(mm*mm))
-            print("Normalized Parallel emittance in mm-mrad = ", norm_parallel_emittance/(mm*mm))
-            print(40*'=')
-            return ''
+        while dump:
+            def emittance_table(transverse_emittance, parallel_emittance, norm_transverse_emittance, norm_parallel_emittance):
+                print(40*"=")
+                print("Transverse emittance in mm-mrad = ", transverse_emittance/(mm*mm))
+                print("Parallel emittance in mm-mrad = ", parallel_emittance/(mm*mm))
+                print(40*'-')
+                print("Normalized Transverse emittance in mm-mrad = ", norm_transverse_emittance/(mm*mm))
+                print("Normalized Parallel emittance in mm-mrad = ", norm_parallel_emittance/(mm*mm))
+                print(40*'=')
+                return ''
 
 
-        sigmax, sigmay, sigmaz = sigma[0], sigma[1], sigma[2]
-        temp_perp, temp_para = temperature[0], temperature[1]
+            sigmax, sigmay, sigmaz = sigma[0], sigma[1], sigma[2]
+            temp_perp, temp_para = temperature[0], temperature[1]
 
-        Vz = np.sqrt(2*jperev*self.energy/self.beam.mass) #parallel velocity
+            Vz = np.sqrt(2*jperev*self.energy/self.beam.mass) #parallel velocity
 
-        #Calculate Emittances
-        transverse_emittance = sigmax*np.sqrt(temp_perp/self.energy)/np.sqrt(2)
-        parallel_emittance = sigmaz*np.sqrt(temp_para/self.energy)/np.sqrt(2)
+            #Calculate Emittances
+            transverse_emittance = sigmax*np.sqrt(temp_perp/self.energy)/np.sqrt(2)
+            parallel_emittance = sigmaz*np.sqrt(temp_para/self.energy)/np.sqrt(2)
 
-        #Calculate Normalized Emittances
-        beta = Vz/clight
-        norm_transverse_emittance = beta*transverse_emittance
-        norm_parallel_emittance = beta*parallel_emittance
-        print("Position Distribution = {}".format(position_distribution))
-        print("Velocity Distribution = {}".format(velocity_distribution))
-        data = emittance_table(transverse_emittance, parallel_emittance, norm_transverse_emittance, norm_parallel_emittance)
-
+            #Calculate Normalized Emittances
+            beta = Vz/clight
+            norm_transverse_emittance = beta*transverse_emittance
+            norm_parallel_emittance = beta*parallel_emittance
+            print("Position Distribution = {}".format(position_distribution))
+            print("Velocity Distribution = {}".format(velocity_distribution))
+            data = emittance_table(transverse_emittance, parallel_emittance, norm_transverse_emittance, norm_parallel_emittance)
+            dump=0
+            
         return load
 
 

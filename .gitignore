@@ -1,4 +1,6 @@
-.txt
-.cgm
-.cgmlog
+*.png
+*.cgm
+*.cgmlog
 *.txt
+*.mp4
+

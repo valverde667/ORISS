@@ -81,13 +81,13 @@ Vcone = 0. #Voltage for cones
 V00   = 0. #Voltage for drift region and interface annulus
 V01   = 0. #Voltages for annulus 1-8 below
 V02   = 0.
-V03   = 0.
-V04   = 0.
-V05   = 0.
-V06   = 0.
-V07   = 0.
-V08   = 6.*kV
-Vcap  = 6.*kV
+V03   = 50
+V04   = 50
+V05   = 50
+V06   = 50
+V07   = 100
+V08   = 0
+Vcap  = 0
 
 #--Distances to object centers measured from midpoint of ORISS
 #z-centers of right rings
@@ -110,7 +110,7 @@ zcentrcone = drift/2. + lengthIF + gap + cone
 zcentrIF = drift/2. + lengthIF/2.
 zcentdrift = 0. #The origin
 
-#Create Conductors 
+#Create Conductors
 #Create Annlus conductors
 zrend_cyl=ZAnnulus(rmin=entry_radius, rmax=entry_radius+10*mm, length=end_cyl_length,
                voltage=ground, zcent=end_cyl_centr)

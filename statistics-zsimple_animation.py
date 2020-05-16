@@ -75,6 +75,8 @@ for i in range(len(copy['Iter'].unique())):
     stdz_data.append(z_sample.std())
 
 
+
+
 #--Create Center of Mass data
 zcom_coords = []
 xcom_coords = []
@@ -90,7 +92,23 @@ for i in range(len(copy['Iter'].unique())):
 zcom_coords = zcom_coords
 xcom_coords = xcom_coords
 
+fig,ax = plt.subplots(nrows = 2, ncols=1,figsize = (7,7))
+ax[0].scatter(copy['time']/ms, copy['zp[i]']/mm, s=.1)
+ax[0].axhline(y=0,lw=.1,c='k')
+ax[0].axvline(x=0,lw=.1,c='k')
+ax[0].set_xlabel('z[mm]')
+ax[0].set_ylabel('x[mm]')
 
+ax[1].scatter(zcom_coords[:], stdz_data[:], s=.1)
+ax[1].axhline(y=0,lw=.1,c='k')
+ax[1].axvline(x=0,lw=.1,c='k')
+ax[1].set_ylabel(r'$sigma_z$ [mm]')
+ax[1].set_xlabel('z[mm]')
+
+plt.tight_layout()
+plt.savefig(file_save+'E{:.6f}longitudinal.png'.format(particle_energy/kV),dpi=300)
+plt.show()
+raise Exception()
 
 
 #--Create figures for plotting
@@ -101,23 +119,29 @@ stdx_min = 0
 stdx_max = (1+.05)*max(stdx_data)
 stdz_min = 0
 stdz_max = (1+.05)*max(stdz_data)
-#position plots
+
+#CFind limites for plots
 xmin = (1+.05)*copy['xp[i]'].min()
 xmax = (1+.05)*copy['xp[i]'].max()
 zmin = (1+.05)*copy['zp[i]'].min()
 zmax = (1+.05)*copy['zp[i]'].max()
-#Will do x-statstics first
+tmin = 0.
+tmax = tracked_data['time'].max()
+
+#Create figures
 fig = plt.figure(figsize = (9,9))
 zax = plt.subplot2grid((3,3), (0,0), colspan = 2)
 stdzax = plt.subplot2grid((3,3), (1,0), colspan = 2)
 stdztax = plt.subplot2grid((3,3), (2,0), colspan = 3)
 
+
+#Create data Table
 data_table = plt.subplot2grid((3,3),(0,2), rowspan = 2) #Display data during animation
 data_table.set_title("Data Table")
 data_table.text(.05, .95, 'Simple Tuning Distribution', fontsize=10)
 data_table.text(.05, .90, 'Velocity: No Distribution', fontsize=10)
 data_table.text(.05, .85, r'Particle Energy = {:.4f} $\pm$ {}% [kV]'.format(particle_energy/1000, 2), fontsize=10)
-data_table.text(.05, .80, 'Initial Bunch Length: 1mm', fontsize=10)
+data_table.text(.05, .80, 'Initial Bunch Length: 0mm', fontsize=10)
 
 
 data_table.spines['right'].set_visible(False)         #Turn off right spine
@@ -125,36 +149,47 @@ data_table.yaxis.set_major_locator(plt.NullLocator()) #Turn off tick marks in y
 data_table.xaxis.set_major_locator(plt.NullLocator()) #Turn off tick marks in x
 
 
-zax.set_xlim(zmin/mm, zmax/mm)
-zax.set_ylim(xmin/mm, xmax/mm)
-stdzax.set_ylim(stdx_min/mm, stdx_max/mm)
+#figure limit setting
+zax.set_xlim(tmin/ms, tmax/ms)
+zax.set_ylim(zmin/mm, zmax/mm)
+
 stdzax.set_xlim(zmin/mm, zmax/mm)
-stdztax.set_xlim(0, tracked_data['time'].max()/ms)
-stdztax.set_ylim(stdx_min/mm, stdx_max/mm)
+stdzax.set_ylim(stdz_min/mm, stdz_max/mm)
+
+stdztax.set_xlim(tmin/ms, tmax/ms)
+stdztax.set_ylim(stdz_min/mm, stdz_max/mm)
+
 
 #zax.axhline(y = 0, lw = .5, c = 'k')
-zax.axvline(x = 0, lw = .5, c = 'k')
+zax.axhline(y = 0, lw = .5, c = 'k')
 stdzax.axvline(x = 0, lw = .5, c = 'k')
 
+
+#axis labeling
+zax.set_xlabel('Time [ms]',fontsize=14)
+zax.set_ylabel( "z [mm]",fontsize=14)
+
 stdzax.set_xlabel("z [mm]",fontsize=14)
-zax.set_ylabel( "x [mm]",fontsize=14)
 stdzax.set_ylabel(r'$\sigma_{z}$[mm]', fontsize = 14)
+
 stdztax.set_xlabel(r'Time [ms]', fontsize = 14)
 stdztax.set_ylabel(r'$\sigma_{z}$[mm]', fontsize = 14)
 
 
-
-zax.set_title(' x vs z', fontsize = 18)
+#titling
+zax.set_title('z vs Time', fontsize = 18)
 stdzax.set_title(r'$\sigma_{z}$ vs z', fontsize = 18)
 stdztax.set_title(r'$\sigma_{z}$ vs Time', fontsize = 18)
 
 plt.tight_layout()
+plt.show()
+
 
 #--Movie Creation
 
 #Initialize empty scattery for trajectory and line plot for RMS visualization
-scat = zax.scatter([], [], s = .1, )       #Empty scatter plot for r values
-com_scat = zax.scatter([], [], s = .2, c = 'r')      #Empty scatter plot for com values
+scat = zax.scatter([], [], s = .1, c = 'b' )       #Empty scatter plot for r values
+com_scat = zax.scatter([], [], s = .1, c = 'b')      #Empty scatter plot for com values
 line, = stdzax.plot([], [], lw = 1, c = 'k')      #Empty line plot for stdz vs z
 std_time_line, = stdztax.plot([], [], lw = 1, c = 'k')  #Empty line plot for stdz vs time
 
@@ -163,7 +198,7 @@ bunchlength_text = data_table.text(0.05, 0.75, "", transform=data_table.transAxe
 lstpart_text = data_table.text(0.05, 0.70, "", transform=data_table.transAxes)
 time_text = data_table.text(0.05, 0.65, "", transform=data_table.transAxes)
 #Create templates for data
-bunchlength_template = r'$\Delta$(Bunch Length) = {:3f}'
+bunchlength_template = r'$\Delta$(Bunch Length) = {:.4f} [mm]'
 lstpart_template = 'Particles Lost = {:.2f}% ({}/{})'
 time_template = 'Time = %f [ms]'
 
@@ -194,28 +229,26 @@ def animate(i):
 
 
     #--Particle data points
-    sample = copy[copy['Iter'] == i] #For particle only plotting
-    #sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #For ray Tracing
-    xpoints = sample['xp[i]']/mm     #x-coordinates for all particles from 0 to ith iteration
+    #sample = copy[copy['Iter'] == i] #For particle only plotting
+    sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #For ray Tracing
+    #xpoints = sample['xp[i]']/mm     #x-coordinates for all particles from 0 to ith iteration
     zpoints = sample['zp[i]']/mm     #z-coordinates for all particles from 0 to ith iteration
+    time = sample['time']/ms
 
     #--Center of Mass Calculations
-    com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting
-    com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
-    #com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing
-    #com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing
-
-    #--Center of mass moving frame
-    com_xpoint = com_xpoint + 
-    zpoints = com_zpoint + zpoints
-    xpoints  = com_xpoint + xpoints
+    #com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting
+    #com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
+    com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing
+    com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing
 
     #--stdz_points for line plot
     stdz_zpoints = np.array(stdz_data[0:i])/mm
-    stdz_xpoints = np.array(stdz_data[0:i])/mm #x_rms from 0 to ith iteration
+    stdx_xpoints = np.array(stdx_data[0:i])/mm #x_rms from 0 to ith iteration
 
     #Update bunch Length
-    bunchlength = max(zpoints) - min(zpoints)
+
+    bunchlength = abs(sample[sample['Iter'] == i]['zp[i]'].max()
+                      - sample[sample['Iter'] == i]['zp[i]'].min())/mm
 
     #Lost Particle value
     Nplost = tracked_data['Nplost'][i]
@@ -223,7 +256,7 @@ def animate(i):
 
     #time coordinates
     time_point = tracked_data['time'][i]/ms
-    time_points = tracked_data['time'][0:i]/ms
+    time_points = tracked_data['time'][0:i]/ms #ray tracing
 
 
 
@@ -231,17 +264,17 @@ def animate(i):
     #Create arrays to feed into scatter plots using scat.set_offsets.
     #It is important to note tha set_offsets takes in (N,2) arrays. This is the reasoning for
     #adding np.newaxis the command. These arrays are then ((x,y), newaxis).
-    scat_plot_points = np.hstack((zpoints[:, np.newaxis], xpoints[:, np.newaxis]))
-    com_scat_point = np.hstack((com_zpoint[:,np.newaxis], com_xpoint[:,np.newaxis])) #Particle plotting
-    #com_scat_point = np.hstack((com_zpoint[:, np.newaxis], com_xpoint[:, np.newaxis])) #ray tracing
+    scat_plot_points = np.hstack((time[:, np.newaxis], zpoints[:, np.newaxis]))
+    #com_scat_point = np.hstack((time_point[:,np.newaxis], com_zpoints[:,np.newaxis])) #Particle plotting
+    com_scat_point = np.hstack((time_points[:, np.newaxis], com_zpoint[:, np.newaxis])) #ray tracing
 
 
     #Enter in new plot points.
     scat.set_offsets(scat_plot_points) #Scatter plot of x vs z
     com_scat.set_offsets(com_scat_point) # center of mass points
 
-    line.set_data(com_zpoint, stdz_zpoints) #std_r line plot
-    std_time_line.set_data(time_points, stdz_zpoints) #std_r time plot
+    line.set_data(com_zpoint, stdz_zpoints) #std_z line plot
+    std_time_line.set_data(time_points, stdz_zpoints) #std_z time plot
 
 
     bunchlength_text.set_text(bunchlength_template.format(bunchlength))

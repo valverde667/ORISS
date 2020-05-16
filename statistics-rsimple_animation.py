@@ -57,6 +57,18 @@ copy['r'] = np.sqrt(copy['xp[i]']**2 + copy['yp[i]']**2)
 #     else:
 #         pass
 
+#
+fig,ax = plt.subplots(figsize = (7,7))
+ax.scatter(copy['zp[i]']/mm, copy['xp[i]']/mm, s=.1)
+ax.set_xlabel('z[mm]')
+ax.set_ylabel('x[mm]')
+ax.axhline(y=0,lw=.1,c='k')
+ax.axvline(x=0, lw=.1, c='k')
+plt.tight_layout()
+plt.savefig(file_save+'E{:.6f}transverse.png'.format(particle_energy/kV),dpi=300)
+plt.show()
+raise Exception()
+
 Np = len(copy['Particle'].unique()) #number of particles including lost particles.
 
 
@@ -178,17 +190,17 @@ def init():
 
 #Animation function. This will update the scatterplot coordinates for the ith frame.
 sign_list = np.sign(tracked_data['uzp[i]']) #A sign list used later to switch colors of particle rays
-sign_list = np.append(sign_list, 1) #append dummy value to end to prevent animate function error. 
+sign_list = np.append(sign_list, 1) #append dummy value to end to prevent animate function error.
 def animate(i):
-    #Color switching wont work like this for ray tracing since the entire trajectory is replotted. 
+    #Color switching wont work like this for ray tracing since the entire trajectory is replotted.
     #if sign_list[i] != sign_list[i+1]:
         #scat.set_color('m')
    # else:
         #scat.set_color('k')
     print(i) #useful to see how fast the program is running and when it will finish.
-    
+
     #Create a color switching routine
-    
+
 
     #--Particle data points
     #sample = copy[copy['Iter'] == i] #For particle only plotting
@@ -197,10 +209,10 @@ def animate(i):
     zpoints = sample['zp[i]']/mm     #z-coordinates for all particles from 0 to ith iteration
 
     #--Center of Mass Calculations
-    #com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting 
+    #com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting
     #com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
-    com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing 
-    com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing 
+    com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing
+    com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing
 
     #--Stdx_points for line plot
     stdx_zpoints = com_zpoint
@@ -221,8 +233,8 @@ def animate(i):
     #It is important to note tha set_offsets takes in (N,2) arrays. This is the reasoning for
     #adding np.newaxis the command. These arrays are then ((x,y), newaxis).
     scat_plot_points = np.hstack((zpoints[:, np.newaxis], xpoints[:, np.newaxis]))
-    #com_scat_point = np.hstack((com_zpoint[:,np.newaxis], com_xpoint[:,np.newaxis])) #Particle plotting 
-    com_scat_point = np.hstack((com_zpoint[:, np.newaxis], com_xpoint[:, np.newaxis])) #ray tracing 
+    #com_scat_point = np.hstack((com_zpoint[:,np.newaxis], com_xpoint[:,np.newaxis])) #Particle plotting
+    com_scat_point = np.hstack((com_zpoint[:, np.newaxis], com_xpoint[:, np.newaxis])) #ray tracing
 
 
     #Enter in new plot points.

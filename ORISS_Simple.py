@@ -43,9 +43,12 @@ top.pboundxy = absorb #boundary condition at edge or radial mesh
 
 
 #Create Species of particles to advance
-uranium_beam = Species(type=Uranium,charge_state=+1,name="Beam species",weight=0) #weight = 0 no spacecharge, 1 = spacecharge. Both go through Poisson sovler.
+uranium_beam = Species(type=Uranium,charge_state=+1,name="Beam species",weight=0)
+               #weight = 0 no spacecharge, 1 = spacecharge.
+               #Both go through Poisson sovler.
 
-top.lbeamcom = False # Specify grid does not move to follow beam center of mass as appropriate for trap simulation
+top.lbeamcom = False #Specify grid does not move to follow beam center
+                     #of mass as appropriate for trap simulation
 
 
 
@@ -58,10 +61,9 @@ generate()     # Initate code, this will also make an initial fieldsolve
 
 solver.ldosolve = False #This sets up the field solver with the beam fields.
                      #particles are treated as interacting. False, turns off space charge
+
+particle_energy = 42.9  #43.1 z (lower energy better) #Right on ffor r 42
 z = w3d.zmesh
-
-particle_energy = 3.5897*kV
-
 # load_list = []
 # p = MyParticle(particle_energy, uranium_beam) #Create particle instance
 # sigma_list = (1*mm, 1*mm, 5*mm)               #Standard deviations (sx, sy, sz)
@@ -71,41 +73,32 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 #load_list = p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
 #                     num_of_particles = Np, sigma = sigma_list, temperature = temp_list)
 
-
-
-
 #--Load particles onto beam
 
-#Transverse Tuning
-#xcoord = [(i)*mm/10 for i in range(70)] #6mm Threshold for no particles lost
-# particle_space = 1
-# xcoord = np.arange(0,3 + particle_space, particle_space)*mm
-# load_list = []
+# # #Transverse Tuning
+# xcoord = np.linspace(-.1,.1,9)*mm
 # p = MyParticle(particle_energy, uranium_beam)
 #
-# for xpos in xcoord:
-#     load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist,
-#                               avg_coordinates = (xpos, 0, 0)))
+# for elem in xcoord:
+#     load_coords = p.loader(position_distribution=pos_dist,
+#                            velocity_distribution=vel_dist,
+#                            avg_coordinates=(elem, 0, 0))
 #
-#     load_list.append(p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist,
-#                               avg_coordinates = (-xpos, 0, 0)))
+#     xpos,ypos,zpos = load_coords[0][0], load_coords[0][1], load_coords[0][2]
+#     vxpos,vypos,vzpos = load_coords[0][3], load_coords[0][4], load_coords[0][5]
 #
-# for array in load_list:
-#       elem = array[0]
-#       xpos,ypos,zpos = elem[0], elem[1], elem[2]
-#       vxpos, vypos, vzpos = elem[3], elem[4], elem[5]
-#
-#       uranium_beam.addparticles(xpos,ypos,zpos,vxpos,vypos,vzpos)
+#     uranium_beam.addparticles(xpos,ypos,zpos,vxpos,vypos,vzpos)
+
 
 #Z-tuning
-energyspread = [(i*.01+1)*particle_energy for i in range(-4,5)]
+energyspread = [(i*0.005+1)*particle_energy for i in range(-4,5)]
 for energy in energyspread:
     p = MyParticle(energy, uranium_beam)
     load_coords = p.loader()
     xpos,ypos,zpos = load_coords[0][0], load_coords[0][1], load_coords[0][2]
     vxpos,vypos,vzpos = load_coords[0][3], load_coords[0][4], load_coords[0][5]
     uranium_beam.addparticles(xpos,ypos,zpos,vxpos,vypos,vzpos)
-  
+
 
 #--Add tracer particle
 tracked_uranium =  Species(type=Uranium,charge_state=+1,name="Beam species",weight=0)
@@ -122,8 +115,6 @@ def scrapebeam():
 #scraper = ParticleScraper(conductors = [target], lcollectlpdata=1)
 installparticlescraper(scrapebeam)
 top.lsavelostpart = 1
-
-
 
 
 
@@ -149,10 +140,10 @@ phi_plot, Ezplot, Erplot = axes[0], axes[1], axes[2]
 #phi plotting
 phi_plot.plot(z, getphi(ix=0)/kV, lw=1, label = r'$\Phi(z,r=0)$ [kV/m]')
 phi_plot.axhline(y=particle_energy/kV, c='r', linestyle = '--', lw=.75,
-                 label='P Particle Energy {:.3f} [kV]'.format(particle_energy/kV))
+                 label='P Particle Energy {:.5f} [kV]'.format(particle_energy/kV))
 phi_plot.axhline(y=max(getphi(ix=0))/kV, c='b', linestyle='--', lw=.75,
-                 label='Max Potential {:.3f} [kV]'.format(max(getphi(ix=0))/kV))
-phi_plot.legend(fontsize=10)
+                 label='Max Potential {:.5f} [kV]'.format(max(getphi(ix=0))/kV))
+phi_plot.legend(fontsize=8)
 
 phi_plot.set_title('Applied Electric Potential on Axis', fontsize=16)
 phi_plot.set_ylabel('Potential (KV)', fontsize=10)
@@ -179,76 +170,77 @@ Erplot.legend(loc='upper center')
 
 plt.legend()
 plt.tight_layout()
-plt.savefig(field_diagnostic_file_string + 'E{:.4f}'.format(particle_energy/kV)
+plt.savefig(field_diagnostic_file_string + 'E{:.6f}'.format(particle_energy/kV)
             + 'Fields_on-axis.png', dpi=300)
-
-
-#--Global/Local Field Contour Plots
-numcntrs = 25 #Set number of contour lines.
-#Get local data points
-zlocal = w3d.zmesh[int(w3d.nz/2):-1]
-rlocal = w3d.xmesh[0:beam_index +1]
-philocal = getphi()[0:beam_index+1,int(w3d.nz/2):-1]
-
-
-
-#Create plot
-fig,axes = plt.subplots(nrows = 2, ncols = 1, figsize=(8,8))
-phiax = axes[0]
-philocalax = axes[1]
-
-#Plot Globals Field
-phicnt = phiax.contour(w3d.zmesh, w3d.xmesh, getphi()/kV,
-                       levels=numcntrs, cmap=cm.hsv, linewidths=.5)
-phicb = fig.colorbar(phicnt, shrink=0.8, ax=phiax, label=r'$\Phi(z,r)$ [kV]')
-
-phiax.set_title('Global Applied Electric Potential in r-z', fontsize=16)
-phiax.set_xlabel('z[m]', fontsize=14)
-phiax.set_ylabel('r[m]', fontsize=14)
-
-
-#Plot local field
-locallvls = np.arange(0, max(philocal[0])/kV, .25)
-philocalcnt = philocalax.contour(zlocal, rlocal, philocal/kV,
-                    levels=locallvls, cmap=cm.hsv, linewidths=.5)
-philocalcb= fig.colorbar(philocalcnt, shrink=0.8, ax=philocalax,
-                         label=r'$\Phi(z,r)$ [kV]')
-
-philocalax.set_title("Local Applied Electric Potential in r-z", fontsize=16)
-philocalax.set_xlabel('z [m]', fontsize=14)
-philocalax.set_ylabel('r [m]', fontsize=14)
-
-#p = ax.pcolor(w3d.zmesh/mm, w3d.xmesh/mm, getphi(), cmap=cm.gray, vmin=abs(getphi()).min(), vmax=abs(getphi()).max())
-#cb = fig.colorbar(p, shrink = 0.8, ax=ax)
-
-#l, b, w, h = ax.get_position().bounds
-#-Adjust gray color bar
-#ll, bb, ww, hh = cb.ax.get_position().bounds
-#cb.ax.set_position([ll, b + 0.1*h, ww, h*0.8])
-
-plt.tight_layout()
-plt.show()
-plt.savefig(field_diagnostic_file_string + 'potential_countours.png', dpi=400)
-
-
-#--Wire Plot
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-zwire = zlocal[int(len(zlocal)/2):-1]
-R, Z = np.meshgrid(rlocal, zwire)
-
-phiwire = philocal[::, int(len(zlocal)/2):-1]
-# Plot a basic wireframe.
-
-ax.plot_wireframe(R/mm, Z, phiwire.T/kV, rstride=8, cstride=8)
-ax.set_title("Local Applied Electric Potential in r-z ")
-ax.set_xlabel('r[mm]')
-ax.set_ylabel('z [m]')
-ax.set_zlabel('Potential [kV]')
-plt.savefig(field_diagnostic_file_string + 'potential_wireframe.png', dpi=400)
 plt.show()
 
+raise Exception()
 
+# #--Global/Local Field Contour Plots
+# numcntrs = 25 #Set number of contour lines.
+# #Get local data points
+# zlocal = w3d.zmesh[int(w3d.nz/2):-1]
+# #zlocal = w3d.zmesh
+# rlocal = w3d.xmesh[0:beam_index +1]
+# philocal = getphi()[0:beam_index+1,int(w3d.nz/2):-1]
+#
+#
+#
+# #Create plot
+# fig,axes = plt.subplots(nrows = 2, ncols = 1, figsize=(8,8))
+# phiax = axes[0]
+# philocalax = axes[1]
+#
+# #Plot Globals Field
+# phicnt = phiax.contour(w3d.zmesh, w3d.xmesh, getphi()/kV,
+#                        cmap=cm.hsv, linewidths=.5)
+# phicb = fig.colorbar(phicnt, shrink=0.8, ax=phiax, label=r'$\Phi(z,r)$ [kV]')
+#
+# phiax.set_title('Global Applied Electric Potential in r-z', fontsize=16)
+# phiax.set_xlabel('z[m]', fontsize=14)
+# phiax.set_ylabel('r[m]', fontsize=14)
+#
+#
+# #Plot local field
+# locallvls = np.linspace(0, max(philocal[0])/kV, 25)
+# philocalcnt = philocalax.contour(zlocal, rlocal, philocal/kV,
+#                     levels=locallvls, cmap=cm.hsv, linewidths=.5)
+# philocalcb= fig.colorbar(philocalcnt, shrink=0.8, ax=philocalax,
+#                          label=r'$\Phi(z,r)$ [kV]')
+#
+# philocalax.set_title("Local Applied Electric Potential in r-z", fontsize=16)
+# philocalax.set_xlabel('z [m]', fontsize=14)
+# philocalax.set_ylabel('r [m]', fontsize=14)
+#
+# #p = ax.pcolor(w3d.zmesh/mm, w3d.xmesh/mm, getphi(), cmap=cm.gray, vmin=abs(getphi()).min(), vmax=abs(getphi()).max())
+# #cb = fig.colorbar(p, shrink = 0.8, ax=ax)
+#
+# #l, b, w, h = ax.get_position().bounds
+# #-Adjust gray color bar
+# #ll, bb, ww, hh = cb.ax.get_position().bounds
+# #cb.ax.set_position([ll, b + 0.1*h, ww, h*0.8])
+#
+# plt.tight_layout()
+# plt.show()
+# plt.savefig(field_diagnostic_file_string + 'potential_countours.png', dpi=400)
+#
+#
+# #--Wire Plot
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# zwire = zlocal[int(len(zlocal)/2):-1]
+# R, Z = np.meshgrid(rlocal, zwire)
+#
+# phiwire = philocal[::, int(len(zlocal)/2):-1]
+# # Plot a basic wireframe.
+#
+# ax.plot_wireframe(R/mm, Z, phiwire.T/kV, rstride=8, cstride=8)
+# ax.set_title("Local Applied Electric Potential in r-z ")
+# ax.set_xlabel('r[mm]')
+# ax.set_ylabel('z [m]')
+# ax.set_zlabel('Potential [kV]')
+# plt.savefig(field_diagnostic_file_string + 'potential_wireframe.png', dpi=400)
+# plt.show()
 
 
 #--Plot fields with warp

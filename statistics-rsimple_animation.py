@@ -58,16 +58,16 @@ copy['r'] = np.sqrt(copy['xp[i]']**2 + copy['yp[i]']**2)
 #         pass
 
 #
-fig,ax = plt.subplots(figsize = (7,7))
-ax.scatter(copy['zp[i]']/mm, copy['xp[i]']/mm, s=.1)
-ax.set_xlabel('z[mm]')
-ax.set_ylabel('x[mm]')
-ax.axhline(y=0,lw=.1,c='k')
-ax.axvline(x=0, lw=.1, c='k')
-plt.tight_layout()
-plt.savefig(file_save+'E{:.6f}transverse.png'.format(particle_energy/kV),dpi=300)
-plt.show()
-raise Exception()
+# fig,ax = plt.subplots(figsize = (7,7))
+# ax.scatter(copy['zp[i]']/mm, copy['xp[i]']/mm, s=.1)
+# ax.set_xlabel('z[mm]')
+# ax.set_ylabel('x[mm]')
+# ax.axhline(y=0,lw=.1,c='k')
+# ax.axvline(x=0, lw=.1, c='k')
+# plt.tight_layout()
+# plt.savefig(file_save+'E{:.6f}transverse.png'.format(particle_energy/kV),dpi=300)
+# plt.show()
+# raise Exception()
 
 Np = len(copy['Particle'].unique()) #number of particles including lost particles.
 

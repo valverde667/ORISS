@@ -62,7 +62,7 @@ generate()     # Initate code, this will also make an initial fieldsolve
 solver.ldosolve = False #This sets up the field solver with the beam fields.
                      #particles are treated as interacting. False, turns off space charge
 
-particle_energy = 42.9  #43.1 z (lower energy better) #Right on ffor r 42
+particle_energy = 59.85
 z = w3d.zmesh
 # load_list = []
 # p = MyParticle(particle_energy, uranium_beam) #Create particle instance
@@ -75,29 +75,29 @@ vel_dist = 'gaussian'                         #Distribution for velocity
 
 #--Load particles onto beam
 
-# # #Transverse Tuning
-# xcoord = np.linspace(-.1,.1,9)*mm
-# p = MyParticle(particle_energy, uranium_beam)
-#
-# for elem in xcoord:
-#     load_coords = p.loader(position_distribution=pos_dist,
-#                            velocity_distribution=vel_dist,
-#                            avg_coordinates=(elem, 0, 0))
-#
-#     xpos,ypos,zpos = load_coords[0][0], load_coords[0][1], load_coords[0][2]
-#     vxpos,vypos,vzpos = load_coords[0][3], load_coords[0][4], load_coords[0][5]
-#
-#     uranium_beam.addparticles(xpos,ypos,zpos,vxpos,vypos,vzpos)
+# #Transverse Tuning
+xcoord = np.linspace(-.1,.1,9)*mm
+p = MyParticle(particle_energy, uranium_beam)
 
+for elem in xcoord:
+    load_coords = p.loader(position_distribution=pos_dist,
+                           velocity_distribution=vel_dist,
+                           avg_coordinates=(elem, 0, 0))
 
-#Z-tuning
-energyspread = [(i*0.005+1)*particle_energy for i in range(-4,5)]
-for energy in energyspread:
-    p = MyParticle(energy, uranium_beam)
-    load_coords = p.loader()
     xpos,ypos,zpos = load_coords[0][0], load_coords[0][1], load_coords[0][2]
     vxpos,vypos,vzpos = load_coords[0][3], load_coords[0][4], load_coords[0][5]
+
     uranium_beam.addparticles(xpos,ypos,zpos,vxpos,vypos,vzpos)
+
+
+# #Z-tuning
+# energyspread = [(i*0.005+1)*particle_energy for i in range(-4,5)]
+# for energy in energyspread:
+#     p = MyParticle(energy, uranium_beam)
+#     load_coords = p.loader()
+#     xpos,ypos,zpos = load_coords[0][0], load_coords[0][1], load_coords[0][2]
+#     vxpos,vypos,vzpos = load_coords[0][3], load_coords[0][4], load_coords[0][5]
+#     uranium_beam.addparticles(xpos,ypos,zpos,vxpos,vypos,vzpos)
 
 
 #--Add tracer particle
@@ -174,7 +174,7 @@ plt.savefig(field_diagnostic_file_string + 'E{:.6f}'.format(particle_energy/kV)
             + 'Fields_on-axis.png', dpi=300)
 plt.show()
 
-raise Exception()
+
 
 # #--Global/Local Field Contour Plots
 # numcntrs = 25 #Set number of contour lines.

@@ -92,23 +92,23 @@ for i in range(len(copy['Iter'].unique())):
 zcom_coords = zcom_coords
 xcom_coords = xcom_coords
 
-fig,ax = plt.subplots(nrows = 2, ncols=1,figsize = (7,7))
-ax[0].scatter(copy['time']/ms, copy['zp[i]']/mm, s=.1)
-ax[0].axhline(y=0,lw=.1,c='k')
-ax[0].axvline(x=0,lw=.1,c='k')
-ax[0].set_xlabel('z[mm]')
-ax[0].set_ylabel('x[mm]')
-
-ax[1].scatter(zcom_coords[:], stdz_data[:], s=.1)
-ax[1].axhline(y=0,lw=.1,c='k')
-ax[1].axvline(x=0,lw=.1,c='k')
-ax[1].set_ylabel(r'$sigma_z$ [mm]')
-ax[1].set_xlabel('z[mm]')
-
-plt.tight_layout()
-plt.savefig(file_save+'E{:.6f}longitudinal.png'.format(particle_energy/kV),dpi=300)
-plt.show()
-raise Exception()
+# fig,ax = plt.subplots(nrows = 2, ncols=1,figsize = (7,7))
+# ax[0].scatter(copy['time']/ms, copy['zp[i]']/mm, s=.1)
+# ax[0].axhline(y=0,lw=.1,c='k')
+# ax[0].axvline(x=0,lw=.1,c='k')
+# ax[0].set_xlabel('z[mm]')
+# ax[0].set_ylabel('x[mm]')
+#
+# ax[1].scatter(zcom_coords[:], stdz_data[:], s=.1)
+# ax[1].axhline(y=0,lw=.1,c='k')
+# ax[1].axvline(x=0,lw=.1,c='k')
+# ax[1].set_ylabel(r'$sigma_z$ [mm]')
+# ax[1].set_xlabel('z[mm]')
+#
+# plt.tight_layout()
+# plt.savefig(file_save+'E{:.6f}longitudinal.png'.format(particle_energy/kV),dpi=300)
+# plt.show()
+# raise Exception()
 
 
 #--Create figures for plotting

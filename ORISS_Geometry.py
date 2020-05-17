@@ -81,13 +81,13 @@ Vcone = 0. #Voltage for cones
 V00   = 0. #Voltage for drift region and interface annulus
 V01   = 0. #Voltages for annulus 1-8 below
 V02   = 0.
-V03   = 50
-V04   = 50
-V05   = 50
-V06   = 50
-V07   = 100
-V08   = 0
-Vcap  = 0
+V03   = 0.
+V04   = 0.
+V05   = 0.
+V06   = 0.
+V07   = 0.
+V08   = 100
+Vcap  = 100
 
 #--Distances to object centers measured from midpoint of ORISS
 #z-centers of right rings

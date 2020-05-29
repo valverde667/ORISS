@@ -26,7 +26,7 @@ print("--- %s seconds ---" % (time.time() - start_time))
 # Simulation Mesh, create in w3d but run field solve in r-z
 ####################################################################
 
-exec(open("ORISS_Geometry.py").read()) #Create simulation mesh
+exec(open("AORISS_Geometry.py").read()) #Create simulation mesh
 
 
 
@@ -34,7 +34,7 @@ exec(open("ORISS_Geometry.py").read()) #Create simulation mesh
 # Particle Moving and Species
 ####################################################################
 
-top.dt     = 1e-7 # Timestep of particle advance
+top.dt     = 1e-8 # Timestep of particle advance
 
 #Set particle boundary conditions at mesh ends
 top.pbound0 = absorb  #boundary condition at iz == 0
@@ -62,7 +62,7 @@ generate()     # Initate code, this will also make an initial fieldsolve
 solver.ldosolve = False #This sets up the field solver with the beam fields.
                      #particles are treated as interacting. False, turns off space charge
 
-particle_energy = 59.85
+particle_energy = .6290*kV
 z = w3d.zmesh
 # load_list = []
 # p = MyParticle(particle_energy, uranium_beam) #Create particle instance
@@ -72,7 +72,6 @@ pos_dist = 'gaussian'                         #Distribution for position
 vel_dist = 'gaussian'                         #Distribution for velocity
 #load_list = p.loader(position_distribution = pos_dist, velocity_distribution = vel_dist, \
 #                     num_of_particles = Np, sigma = sigma_list, temperature = temp_list)
-
 #--Load particles onto beam
 
 # #Transverse Tuning
@@ -134,19 +133,44 @@ beam_index = int(25*mm*w3d.nx/w3d.xmmax) + 1 #index for slicing arrays to r = 25
 Er, Ez = getselfe(comp='x'), getselfe(comp='z') #Grab E fields from warp
 
 #Create plots
-fig, axes = plt.subplots(nrows = 3, ncols = 1, sharex = True, figsize = (7,7))
-phi_plot, Ezplot, Erplot = axes[0], axes[1], axes[2]
+fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (7,7))
+phi_plot = axes
+
 
 #phi plotting
-phi_plot.plot(z, getphi(ix=0)/kV, lw=1, label = r'$\Phi(z,r=0)$ [kV/m]')
+phi_plot.plot(z[int(len(z)/2):], getphi(ix=0)[int(len(z)/2):]/kV, lw=1, label = r'$\Phi(z,r=0)$ [kV/m]')
 phi_plot.axhline(y=particle_energy/kV, c='r', linestyle = '--', lw=.75,
-                 label='P Particle Energy {:.5f} [kV]'.format(particle_energy/kV))
-phi_plot.axhline(y=max(getphi(ix=0))/kV, c='b', linestyle='--', lw=.75,
-                 label='Max Potential {:.5f} [kV]'.format(max(getphi(ix=0))/kV))
+                 label='Particle Energy KE [kV]')
+# phi_plot.axhline(y=max(getphi(ix=0))/kV, c='b', linestyle='--', lw=.75,
+#                  label='Max Potential {:.5f} [kV]'.format(max(getphi(ix=0))/kV))
+zatmaxphi = np.where(getphi()[0] == getphi()[0].max())[0] #index where max phi is
+phi_plot.axvline(x = z[zatmaxphi],c='k', linestyle='--', lw=.5)
+#phi_plot.axvline(x = -z[zatmaxphi],c='k', linestyle='--', lw=.5)
 phi_plot.legend(fontsize=8)
 
-phi_plot.set_title('Applied Electric Potential on Axis', fontsize=16)
-phi_plot.set_ylabel('Potential (KV)', fontsize=10)
+phi_plot.set_title('Potential Mirror for MR-ToF Device', fontsize=14)
+phi_plot.set_ylabel('Applied Potential On-axis [KV]', fontsize=12)
+phi_plot.set_xlabel('Axial Distance z [m]', fontsize=12)
+plt.tight_layout()
+plt.show()
+raise Exception()
+# fig, axes = plt.subplots(nrows = 3, ncols = 1, sharex = True, figsize = (7,7))
+# phi_plot, Ezplot, Erplot = axes[0], axes[1], axes[2]
+#
+#
+# #phi plotting
+# phi_plot.plot(z, getphi(ix=0)/kV, lw=1, label = r'$\Phi(z,r=0)$ [kV/m]')
+# phi_plot.axhline(y=particle_energy/kV, c='r', linestyle = '--', lw=.75,
+#                  label='P Particle Energy {:.5f} [kV]'.format(particle_energy/kV))
+# # phi_plot.axhline(y=max(getphi(ix=0))/kV, c='b', linestyle='--', lw=.75,
+# #                  label='Max Potential {:.5f} [kV]'.format(max(getphi(ix=0))/kV))
+# zatmaxphi = np.where(getphi()[0] == getphi()[0].max())[0] #index where max phi is
+# phi_plot.axvline(x = z[zatmaxphi],c='k', linestyle='--', lw=.5)
+# phi_plot.axvline(x = -z[zatmaxphi],c='k', linestyle='--', lw=.5)
+# phi_plot.legend(fontsize=8)
+#
+# phi_plot.set_title('Applied Electric Potential on Axis', fontsize=16)
+# phi_plot.set_ylabel('Potential (KV)', fontsize=10)
 
 #Electric field plotting
 Ezr0 = Ez[0] #E_z at a r = 0
@@ -154,9 +178,15 @@ Err0 = Er[1]/w3d.xmesh[1] #E_r/r two step sizes away from axis
 
 Ezplot.plot(z, Ezr0/kV, c='m', lw=1, label=r'$E_z(z,r=0)$ [kV/$m^2$]')
 Ezplot.axhline(y=0, c='k', lw=.5)
+Ezplot.axvline(x = z[zatmaxphi],c='k', linestyle='--', lw=.5)
+Ezplot.axvline(x = -z[zatmaxphi],c='k', linestyle='--', lw=.5)
+
 
 Erplot.plot(z, Err0/kV, c='m', lw=1, label=r'$\frac{E_r(z,r)}{r}|_{\approx0}$ [kV/$m^3$]')
 Erplot.axhline(y=0, c='k', lw=.5)
+Erplot.axvline(x = z[zatmaxphi],c='k', linestyle='--', lw=.5)
+Erplot.axvline(x = -z[zatmaxphi],c='k', linestyle='--', lw=.5)
+
 
 #Set Labels
 Ezplot.set_title(r"Applied $E_z$ on Axis", fontsize=16)
@@ -173,9 +203,7 @@ plt.tight_layout()
 plt.savefig(field_diagnostic_file_string + 'E{:.6f}'.format(particle_energy/kV)
             + 'Fields_on-axis.png', dpi=300)
 plt.show()
-
-
-
+raise Exception()
 # #--Global/Local Field Contour Plots
 # numcntrs = 25 #Set number of contour lines.
 # #Get local data points
@@ -253,7 +281,6 @@ plt.show()
 ####################################################################
 # Generate Output files for post-process
 ####################################################################
-
 #Create files
 trajectoryfile = open("trajectoryfile.txt","w")  # saves marker trajectories
 trackedfile = open("tracked_particle.txt", "w")
@@ -293,8 +320,6 @@ trackedfile.write('{},{},{},{},{},{}'.format(0, tracked_uranium.getz()[0], track
 bounce_count = 0
 iteration = 0
 while bounce_count <=1:
-#while iteration < 10:
-
     step(1)  # advance particles
     sign_list = np.sign(tracked_uranium.getvz())
 

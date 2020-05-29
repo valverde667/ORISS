@@ -17,7 +17,6 @@ file_save = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Animations/Si
 #Some useful defintions.
 mm = 1e-3
 ms = 1e-3
-time = 1e-7
 kV = 1000.
 
 #--Read in variables and assign values from parameters.txt.
@@ -229,17 +228,17 @@ def animate(i):
 
 
     #--Particle data points
-    #sample = copy[copy['Iter'] == i] #For particle only plotting
-    sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #For ray Tracing
+    sample = copy[copy['Iter'] == i] #For particle only plotting
+    #sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #For ray Tracing
     #xpoints = sample['xp[i]']/mm     #x-coordinates for all particles from 0 to ith iteration
     zpoints = sample['zp[i]']/mm     #z-coordinates for all particles from 0 to ith iteration
     time = sample['time']/ms
 
     #--Center of Mass Calculations
-    #com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting
-    #com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
-    com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing
-    com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing
+    com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting
+    com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
+    #com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing
+    #com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing
 
     #--stdz_points for line plot
     stdz_zpoints = np.array(stdz_data[0:i])/mm
@@ -265,8 +264,8 @@ def animate(i):
     #It is important to note tha set_offsets takes in (N,2) arrays. This is the reasoning for
     #adding np.newaxis the command. These arrays are then ((x,y), newaxis).
     scat_plot_points = np.hstack((time[:, np.newaxis], zpoints[:, np.newaxis]))
-    #com_scat_point = np.hstack((time_point[:,np.newaxis], com_zpoints[:,np.newaxis])) #Particle plotting
-    com_scat_point = np.hstack((time_points[:, np.newaxis], com_zpoint[:, np.newaxis])) #ray tracing
+    com_scat_point = np.hstack((time_point[:,np.newaxis], com_zpoints[:,np.newaxis])) #Particle plotting
+    #com_scat_point = np.hstack((time_points[:, np.newaxis], com_zpoint[:, np.newaxis])) #ray tracing
 
 
     #Enter in new plot points.

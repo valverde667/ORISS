@@ -17,7 +17,6 @@ file_save = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Animations/Si
 #Some useful defintions.
 mm = 1e-3
 ms = 1e-3
-time = 1e-7
 kV = 1000.
 
 #--Read in variables and assign values from parameters.txt.
@@ -203,16 +202,16 @@ def animate(i):
 
 
     #--Particle data points
-    #sample = copy[copy['Iter'] == i] #For particle only plotting
-    sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #For ray Tracing
+    sample = copy[copy['Iter'] == i] #For particle only plotting
+    #sample = copy[(copy['Iter'] >= 0) & (copy['Iter'] <= i)] #For ray Tracing
     xpoints = sample['xp[i]']/mm     #x-coordinates for all particles from 0 to ith iteration
     zpoints = sample['zp[i]']/mm     #z-coordinates for all particles from 0 to ith iteration
 
     #--Center of Mass Calculations
-    #com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting
-    #com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
-    com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing
-    com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing
+    com_xpoint = np.array([xcom_coords[i]])/mm   #x-COM-coordinates for particle plotting
+    com_zpoint = np.array([zcom_coords[i]])/mm   #z-COM-coordinates for particle plotting
+    #com_xpoint = np.array(xcom_coords[0:i])/mm #x-COM-coordinates for ray tracing
+    #com_zpoint = np.array(zcom_coords[0:i])/mm #z-COM-coordinates for ray tracing
 
     #--Stdx_points for line plot
     stdx_zpoints = com_zpoint

@@ -41,17 +41,10 @@ w3d.boundxy = dirichlet #in all transverse directions
 
 f3d.mgmaxiters = 1000 #  Max iterations of multigrid field solve
 
-#solver=MultiGrid3D() # 3-D field solver (need to define x-mesh and y-mesh consistent)
-solver=MultiGridRZ() # multi-grid Poisson solver in 2-D r-z geometry
-
-
-#child1=solver.addchild(mins=[0.,0.,-1.],maxs=[.01,0.,.1],refinement=[100,1,100]  # Define mesh refinement
-
+solver = MultiGridRZ() # multi-grid Poisson solver in 2-D r-z geometry
 solver.mgverbose = +1 #cannot find what these settings do.
 solver.mgtol = 1.e-4  # Absolute tolerance (convergance) of field solver in potential [Volts]
-
-registersolver(solver) # register field solver so pic cycle uses
-
+registersolver(solver)
 
 ####################################################################
 # Define Conductors to Load on Mesh
@@ -81,13 +74,12 @@ Vcone = 0. #Voltage for cones
 V00   = 0. #Voltage for drift region and interface annulus
 V01   = 0. #Voltages for annulus 1-8 below
 V02   = 0.
-V03   = 0.
-V04   = 0.
-V05   = 0.
-V06   = 0.
-V07   = 0.
-V08   = 100
-Vcap  = 100
+V03   = .5*kV
+V04   = .5*kV
+V05   = .5*kV
+V06   = .5*kV
+V07   = 1.*kV
+V08   = 0.
 
 #--Distances to object centers measured from midpoint of ORISS
 #z-centers of right rings

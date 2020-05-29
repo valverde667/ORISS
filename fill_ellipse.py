@@ -14,8 +14,8 @@ def fill_position(num_of_particles, sigma, avg_coordinates):
     rperp = sqrt(x**2 + y**2)
     rz = z
 
-    position_array = []
     counter = 0
+    position_array = np.zeros([num_of_particles, 3], dtype = float)
     while counter < num_of_particles:
 
         Ux = np.random.uniform(0,1)
@@ -32,12 +32,12 @@ def fill_position(num_of_particles, sigma, avg_coordinates):
         condition = term1 + term2
 
         if condition < 1:
-            position_array.append((dx,dy,dz))
+            position_array[counter][0] = dx
+            position_array[counter][1] = dy
+            position_array[counter][2] = dz
             counter += 1
         else:
             pass
-
-    position_array = np.array(position_array)
 
     return position_array
 
@@ -49,7 +49,7 @@ def fill_velocity(mass, energy,num_of_particles, avg_velocities, Vz, temperature
         Vx, Vy = avg_velocities[0], avg_velocities[1]
         eVtoK = 8.62e-5 #conversion from eV to Kelvin
         Vz = sqrt(2*jperev*energy/mass)
-        temp_para, temp_perp = temperature[0]/eVtoK, temperature[1]/eVtoK #convert to K
+        temp_para, temp_perp = temperature[0]*eVtoK, temperature[1]*eVtoK #convert to K
         vperp = sqrt(5*boltzmann*temp_perp/(2*mass))
         vpara = sqrt(5*boltzmann*temp_para/mass)
 
@@ -59,28 +59,28 @@ def fill_velocity(mass, energy,num_of_particles, avg_velocities, Vz, temperature
 
         #Fill routine
         counter = 0
-        velocity_array = []
+        velocity_array = np.zeros([num_of_particles, 3], dtype = float)
         while counter < num_of_particles:
 
             Ux = np.random.uniform(0,1)
             Uy = np.random.uniform(0,1)
             Uz = np.random.uniform(0,1)
 
-            dvx = vperp*(-1 + 2*Ux)
-            dvy = vperp*(-1 + 2*Uy)
+            dvx = vx*(-1 + 2*Ux)
+            dvy = vy*(-1 + 2*Uy)
             dvz = vz*(-1 + 2*Uz)
 
-            term1 = (dvx**2 + dvy**2)/vperp**2
+            term1 = (dvx**2 + dvy**2)/(vx**2 + vy**2)
             term2 = dvz**2/vz**2
 
             condition = term1 + term2
 
             if condition < 1:
-                velocity_array.append((dvx,dvy,abs(dvz)))
+                velocity_array[counter][0] = dvx
+                velocity_array[counter][1] = dvy
+                velocity_array[counter][2] = abs(dvz)
                 counter += 1
             else:
                 pass
-
-        velocity_array = np.array(velocity_array)
 
         return velocity_array

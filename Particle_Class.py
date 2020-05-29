@@ -143,6 +143,10 @@ class MyParticle(object):
             return print("No distribution selected.")
 
 
+    #def plxy(self, x, y):
+
+
+
 
     def loader(self, position_distribution='gaussian', velocity_distribution='gaussian',
                num_of_particles=1, sigma=(0, 0, 0), temperature=(0, 0),
@@ -183,7 +187,7 @@ class MyParticle(object):
             print("Velocity Distribution = {}".format(velocity_distribution))
             data = emittance_table(transverse_emittance, parallel_emittance, norm_transverse_emittance, norm_parallel_emittance)
             dump=0
-            
+
         return load
 
 

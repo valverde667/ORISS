@@ -2,14 +2,6 @@
 #Using Uranium (238) and Neptunium (237)
 #IMPORTANT DO NOT NAME ANYTHING LOAD, this interrupts with a declared functionion Species.py
 
-#--Import Warp Packages and modules
-from warp import *
-from warp.particles.singleparticle import TraceParticle
-from Forthon import *
-
-#--Import user created files
-from Particle_Class import *
-from fill_ellipse import *
 
 #--Import python packages
 import matplotlib.pyplot as plt
@@ -17,6 +9,15 @@ from mpl_toolkits.mplot3d import axes3d, Axes3D
 from matplotlib import cm
 import numpy as np
 import time
+
+#--Import Warp Packages and modules
+import warp as wp
+from warp.particles.singleparticle import TraceParticle
+
+#--Import user created files
+from Particle_Class import *
+from fill_ellipse import *
+
 
 start_time = time.time()
 print("--- %s seconds ---" % (time.time() - start_time))

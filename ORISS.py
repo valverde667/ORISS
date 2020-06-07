@@ -34,22 +34,22 @@ exec(open("ORISS_Geometry.py").read()) #Create simulation mesh
 ####################################################################
 # Particle Moving and Species
 ####################################################################
-
+mm = wp.mm
+kV = wp.kV
 wp.top.dt     = 1e-7 # Timestep of particle advance
 
 #Set particle boundary conditions at mesh ends
-wp.top.pbound0 = absorb  #boundary condition at iz == 0
-wp.top.pboundnz = absorb #boundary condition at iz == nz
-wp.top.pboundxy = absorb #boundary condition at edge or radial mesh
+wp.top.pbound0 = wp.absorb  #boundary condition at iz == 0
+wp.top.pboundnz = wp.absorb #boundary condition at iz == nz
+wp.top.pboundxy = wp.absorb #boundary condition at edge or radial mesh
 
 
 #Create Species of particles to advance
-uranium_beam = wp.Species(type=Uranium,charge_state=+1,name="Beam species",weight=1)
+uranium_beam = wp.Species(type=wp.Uranium,charge_state=+1,name="Beam species",weight=0)
                #weight = 0 no spacecharge, 1 = spacecharge.
-               #Both go through Poisson sovler.
 
 wp.top.lbeamcom = False #Specify grid does not move to follow beam center
-                     #of mass as appropriate for trap simulation
+
 
 
 
@@ -60,8 +60,8 @@ wp.top.lbeamcom = False #Specify grid does not move to follow beam center
 wp.package("w3d") # Specify 3D code.  But fieldsolver will be r-z and particles will deposit on r-z mesh
 wp.generate()     # Initate code, this will also make an initial fieldsolve
 
-wp.solver.ldosolve = True #This sets up the field solver with the beam fields.
-                     #particles are treated as interacting. False, turns off space charge
+solver.ldosolve = False #False/True turns off/on space-charge
+
 
 #Load Parameters
 Np = 1000
@@ -98,8 +98,8 @@ parameterfile.close()
 
 
 #--Add tracer particle
-tracked_uranium =  Species(type=Uranium,charge_state=+1,name="Beam species",weight=0)
-tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*jperev/uranium_beam.mass))
+tracked_uranium =  wp.Species(type=wp.Uranium,charge_state=+1,name="Beam species",weight=0)
+tracked_uranium = TraceParticle(vz = np.sqrt(2*particle_energy*wp.jperev/uranium_beam.mass))
 
 #--Add scraper at r=25mm
 aperture_radius = 25*mm
@@ -107,7 +107,7 @@ def scrapebeam():
     rsq = uranium_beam.xp**2 + uranium_beam.yp**2
     uranium_beam.gaminv[rsq >= aperture_radius**2] = 0 #does not save particle, set 0 does.
 
-installparticlescraper(scrapebeam)
+wp.installparticlescraper(scrapebeam)
 wp.top.lsavelostpart = 1 #save lost particles.
 
 
@@ -210,7 +210,7 @@ dist_filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnos
 #-- Create figure for each dist plot and plot.
 #  It is import to create a separate figure for each or else data will mix into
 #  other plots.
-phaseplots = True
+phaseplots = False
 while phaseplots:
     xzplot = plt.figure(1)
     plt.scatter(zpos_list/mm,xpos_list/mm, s = .5)
@@ -353,7 +353,7 @@ trackedfile.write('{},{},{},{},{},{},{},{}'.format(0, tracked_uranium.getz()[0],
 
 bounce_count = 0
 iteration = 0
-while bounce_count <=4:
+while bounce_count <=1:
 #while iteration < 10:
 
     wp.step(1)  # advance particles

@@ -1,15 +1,16 @@
-setup()  # setup graphics etc.
-
+wp.setup()  # setup graphics etc.
+mm = wp.mm
+kV = wp.kV
 ####################################################################
 # Simulation Mesh, create in w3d but run field solve in r-z
 ####################################################################
 
 # x-mesh (radial in r-z)
-w3d.xmmax =   72.*mm # Upper limit of mesh r_max
-w3d.xmmin =    0. # Lower limit of mesh r_min (should be zero for r-z)
+wp.w3d.xmmax =   72.*mm # Upper limit of mesh r_max
+wp.w3d.xmmin =    0. # Lower limit of mesh r_min (should be zero for r-z)
 #w3d.nx    =   4096. # Mesh points are 0,...,nx
 #w3d.nx = 2560
-w3d.nx    = 1024      ### less fine mesh
+wp.w3d.nx    = 1024      ### less fine mesh
 
 # y-mesh (do not define in r-z simulations)
 #w3d.ymmax =   +.1 # Upper limit of mesh
@@ -17,34 +18,34 @@ w3d.nx    = 1024      ### less fine mesh
 #w3d.ny    =   128 # Mesh points are 0,...,ny
 
 # z-mesh
-w3d.zmmax =   +680.*mm # Upper limit of mesh
-w3d.zmmin =   -680.*mm # Lower limit of mesh
+wp.w3d.zmmax =   +680.*mm # Upper limit of mesh
+wp.w3d.zmmin =   -680.*mm # Lower limit of mesh
 #w3d.nz    =   4096 # Mesh points are 0,...,nz
 #w3d.nz  = 2560
-w3d.nz    = 1024   ### less fine
+wp.w3d.nz    = 1024   ### less fine
 
 
 ####################################################################
 # Field Solve
 ####################################################################
 
-w3d.solvergeom = w3d.RZgeom # Setting Solver Geometry. In this case this is
+wp.w3d.solvergeom = wp.w3d.RZgeom # Setting Solver Geometry. In this case this is
                             # a Poisson solver in 2-D rz-geometry
 
 ##Set boundary conditions
 
 #Boundary conditions for mesh
-w3d.bound0  = dirichlet # for iz == -nz
-w3d.boundnz = dirichlet # for iz == nz
-w3d.boundxy = dirichlet #in all transverse directions
+wp.w3d.bound0  = wp.dirichlet # for iz == -nz
+wp.w3d.boundnz = wp.dirichlet # for iz == nz
+wp.w3d.boundxy = wp.dirichlet #in all transverse directions
 
 
-f3d.mgmaxiters = 1000 #  Max iterations of multigrid field solve
+wp.f3d.mgmaxiters = 1000 #  Max iterations of multigrid field solve
 
-solver = MultiGridRZ() # multi-grid Poisson solver in 2-D r-z geometry
+solver = wp.MultiGridRZ() # multi-grid Poisson solver in 2-D r-z geometry
 solver.mgverbose = +1 #cannot find what these settings do.
 solver.mgtol = 1.e-4  # Absolute tolerance (convergance) of field solver in potential [Volts]
-registersolver(solver)
+wp.registersolver(solver)
 
 ####################################################################
 # Define Conductors to Load on Mesh
@@ -104,68 +105,68 @@ zcentdrift = 0. #The origin
 
 #Create Conductors
 #Create Annlus conductors
-zrend_cyl=ZAnnulus(rmin=entry_radius, rmax=entry_radius+10*mm, length=end_cyl_length,
+zrend_cyl=wp.ZAnnulus(rmin=entry_radius, rmax=entry_radius+10*mm, length=end_cyl_length,
                voltage=ground, zcent=end_cyl_centr)
-zrwall=ZAnnulus(rmin=entry_radius, rmax=Rmax, length=wall_length, voltage=V08, zcent=zwallcentr)
-zr8=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=zcentr8)
+zrwall=wp.ZAnnulus(rmin=entry_radius, rmax=Rmax, length=wall_length, voltage=V08, zcent=zwallcentr)
+zr8=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=zcentr8)
 zrcap = zrwall + zr8 #Combine last annulus with wall to creat one conductor
-zr7=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V07,zcent=zcentr7)
-zr6=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V06,zcent=zcentr6)
-zr5=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V05,zcent=zcentr5)
-zr4=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V04,zcent=zcentr4)
-zr3=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V03,zcent=zcentr3)
-zr2=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V02,zcent=zcentr2)
-zr1=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V01,zcent=zcentr1)
+zr7=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V07,zcent=zcentr7)
+zr6=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V06,zcent=zcentr6)
+zr5=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V05,zcent=zcentr5)
+zr4=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V04,zcent=zcentr4)
+zr3=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V03,zcent=zcentr3)
+zr2=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V02,zcent=zcentr2)
+zr1=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V01,zcent=zcentr1)
 
 #Create cone conductor
-hrcone = ZSrfrv(rsrf=rsrf,zsrf=zsrf,voltage=Vcone,zcent=zcentrcone)
+hrcone = wp.ZSrfrv(rsrf=rsrf,zsrf=zsrf,voltage=Vcone,zcent=zcentrcone)
 
 #Create interface annulus conductor on right side
-zr0 = ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=lengthIF,voltage=V00,zcent=zcentrIF)
+zr0 = wp.ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=lengthIF,voltage=V00,zcent=zcentrIF)
 
 #Create drift conductor
-zdrift = ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=drift,voltage=V00,zcent=zcentdrift)
+zdrift = wp.ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=drift,voltage=V00,zcent=zcentdrift)
 
 #Create left Cone
-hlcone = ZSrfrv(rsrf=rsrf,zsrf=zsrf,voltage=Vcone,zcent=-zcentrcone)
+hlcone = wp.ZSrfrv(rsrf=rsrf,zsrf=zsrf,voltage=Vcone,zcent=-zcentrcone)
 
 #Create Left interface annulus
-zl0 = ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=lengthIF,voltage=V00,zcent=-zcentrIF)
+zl0 = wp.ZAnnulus(rmin=RminIF,rmax=RmaxIF,length=lengthIF,voltage=V00,zcent=-zcentrIF)
 
 #--Create Conductors for left side of device (symmetric so just replace zcent with negative values of right side)
-zl1=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V01,zcent=-zcentr1)
-zl2=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V02,zcent=-zcentr2)
-zl3=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V03,zcent=-zcentr3)
-zl4=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V04,zcent=-zcentr4)
-zl5=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V05,zcent=-zcentr5)
-zl6=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V06,zcent=-zcentr6)
-zl7=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V07,zcent=-zcentr7)
-zl8=ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=-zcentr8)
-zlwall=ZAnnulus(rmin=entry_radius, rmax=Rmax,length=wall_length, voltage=V08, zcent=-zwallcentr)
+zl1=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V01,zcent=-zcentr1)
+zl2=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V02,zcent=-zcentr2)
+zl3=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V03,zcent=-zcentr3)
+zl4=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V04,zcent=-zcentr4)
+zl5=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V05,zcent=-zcentr5)
+zl6=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V06,zcent=-zcentr6)
+zl7=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V07,zcent=-zcentr7)
+zl8=wp.ZAnnulus(rmin=Rmin,rmax=Rmax,length=length,voltage=V08,zcent=-zcentr8)
+zlwall=wp.ZAnnulus(rmin=entry_radius, rmax=Rmax,length=wall_length, voltage=V08, zcent=-zwallcentr)
 zlcap = zl8 + zlwall #Create left cap conductor by combing wall and annulus
-zlend_cyl=ZAnnulus(rmin=entry_radius, rmax=entry_radius+10*mm, length=end_cyl_length,
+zlend_cyl=wp.ZAnnulus(rmin=entry_radius, rmax=entry_radius+10*mm, length=end_cyl_length,
                voltage=ground, zcent=-end_cyl_centr)
 #--Install conductors on mesh.  These are placed with subgrid precision
-installconductor(zrend_cyl)
-installconductor(zrcap)
-installconductor(zr7)
-installconductor(zr6)
-installconductor(zr5)
-installconductor(zr4)
-installconductor(zr3)
-installconductor(zr2)
-installconductor(zr1)
-installconductor(hrcone)
-installconductor(zr0)
-installconductor(zdrift)
-installconductor(zl0)
-installconductor(hlcone)
-installconductor(zl1)
-installconductor(zl2)
-installconductor(zl3)
-installconductor(zl4)
-installconductor(zl5)
-installconductor(zl6)
-installconductor(zl7)
-installconductor(zlcap)
-installconductor(zlend_cyl)
+wp.installconductor(zrend_cyl)
+wp.installconductor(zrcap)
+wp.installconductor(zr7)
+wp.installconductor(zr6)
+wp.installconductor(zr5)
+wp.installconductor(zr4)
+wp.installconductor(zr3)
+wp.installconductor(zr2)
+wp.installconductor(zr1)
+wp.installconductor(hrcone)
+wp.installconductor(zr0)
+wp.installconductor(zdrift)
+wp.installconductor(zl0)
+wp.installconductor(hlcone)
+wp.installconductor(zl1)
+wp.installconductor(zl2)
+wp.installconductor(zl3)
+wp.installconductor(zl4)
+wp.installconductor(zl5)
+wp.installconductor(zl6)
+wp.installconductor(zl7)
+wp.installconductor(zlcap)
+wp.installconductor(zlend_cyl)

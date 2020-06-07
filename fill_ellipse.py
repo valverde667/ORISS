@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from warp import *
+import warp as wp
 
 
 def fill_position(num_of_particles, sigma, avg_coordinates):
@@ -11,7 +11,7 @@ def fill_position(num_of_particles, sigma, avg_coordinates):
     x = np.random.normal(X, sigmax)
     y = np.random.normal(Y, sigmay)
     z = np.random.normal(Z, sigmaz)
-    rperp = sqrt(x**2 + y**2)
+    rperp = np.sqrt(x**2 + y**2)
     rz = z
 
     counter = 0
@@ -48,10 +48,10 @@ def fill_velocity(mass, energy,num_of_particles, avg_velocities, Vz, temperature
 
         Vx, Vy = avg_velocities[0], avg_velocities[1]
         eVtoK = 8.62e-5 #conversion from eV to Kelvin
-        Vz = sqrt(2*jperev*energy/mass)
+        Vz = np.sqrt(2*wp.jperev*energy/mass)
         temp_para, temp_perp = temperature[0]*eVtoK, temperature[1]*eVtoK #convert to K
-        vperp = sqrt(5*boltzmann*temp_perp/(2*mass))
-        vpara = sqrt(5*boltzmann*temp_para/mass)
+        vperp = np.sqrt(5*wp.boltzmann*temp_perp/(2*mass))
+        vpara = np.sqrt(5*wp.boltzmann*temp_para/mass)
 
         vx = Vx + vperp
         vy = Vy + vperp

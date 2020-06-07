@@ -1,5 +1,5 @@
 import numpy as np
-from warp import *
+import warp as wp
 import matplotlib.pyplot as plt
 
 
@@ -110,13 +110,13 @@ class MyParticle(object):
         energy = self.energy
         temp_para, temp_perp = temperature[0], temperature[1]
         Vx, Vy = avg_velocities[0], avg_velocities[1]
-        Vz = np.sqrt(2*jperev*self.energy/self.beam.mass)
+        Vz = np.sqrt(2*wp.jperev*self.energy/self.beam.mass)
 
         ################## Gaussian Routine ##################################
         if velocity_distribution == 'gaussian':
             #Calculate stand deviations in transverse and logitudinal directions based on Temperatures
-            sigma_transverse_velocity = np.sqrt(jperev*temp_perp/self.beam.mass)
-            sigma_parallel_velocity = np.sqrt(jperev*temp_para/self.beam.mass)
+            sigma_transverse_velocity = np.sqrt(wp.jperev*temp_perp/self.beam.mass)
+            sigma_parallel_velocity = np.sqrt(wp.jperev*temp_para/self.beam.mass)
 
             #Gaussian Algorithm to randomaly generate velocities
             counter = 0
@@ -161,11 +161,11 @@ class MyParticle(object):
         while dump:
             def emittance_table(transverse_emittance, parallel_emittance, norm_transverse_emittance, norm_parallel_emittance):
                 print(40*"=")
-                print("Transverse emittance in mm-mrad = ", transverse_emittance/(mm*mm))
-                print("Parallel emittance in mm-mrad = ", parallel_emittance/(mm*mm))
+                print("Transverse emittance in mm-mrad = ", transverse_emittance/(wp.mm*wp.mm))
+                print("Parallel emittance in mm-mrad = ", parallel_emittance/(wp.mm*wp.mm))
                 print(40*'-')
-                print("Normalized Transverse emittance in mm-mrad = ", norm_transverse_emittance/(mm*mm))
-                print("Normalized Parallel emittance in mm-mrad = ", norm_parallel_emittance/(mm*mm))
+                print("Normalized Transverse emittance in mm-mrad = ", norm_transverse_emittance/(wp.mm*wp.mm))
+                print("Normalized Parallel emittance in mm-mrad = ", norm_parallel_emittance/(wp.mm*wp.mm))
                 print(40*'=')
                 return ''
 
@@ -173,14 +173,14 @@ class MyParticle(object):
             sigmax, sigmay, sigmaz = sigma[0], sigma[1], sigma[2]
             temp_perp, temp_para = temperature[0], temperature[1]
 
-            Vz = np.sqrt(2*jperev*self.energy/self.beam.mass) #parallel velocity
+            Vz = np.sqrt(2*wp.jperev*self.energy/self.beam.mass) #parallel velocity
 
             #Calculate Emittances
             transverse_emittance = sigmax*np.sqrt(temp_perp/self.energy)/np.sqrt(2)
             parallel_emittance = sigmaz*np.sqrt(temp_para/self.energy)/np.sqrt(2)
 
             #Calculate Normalized Emittances
-            beta = Vz/clight
+            beta = Vz/wp.clight
             norm_transverse_emittance = beta*transverse_emittance
             norm_parallel_emittance = beta*parallel_emittance
             print("Position Distribution = {}".format(position_distribution))

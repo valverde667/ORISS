@@ -35,20 +35,20 @@ exec(open("ORISS_Geometry.py").read()) #Create simulation mesh
 # Particle Moving and Species
 ####################################################################
 
-top.dt     = 1e-7 # Timestep of particle advance
+wp.top.dt     = 1e-7 # Timestep of particle advance
 
 #Set particle boundary conditions at mesh ends
-top.pbound0 = absorb  #boundary condition at iz == 0
-top.pboundnz = absorb #boundary condition at iz == nz
-top.pboundxy = absorb #boundary condition at edge or radial mesh
+wp.top.pbound0 = absorb  #boundary condition at iz == 0
+wp.top.pboundnz = absorb #boundary condition at iz == nz
+wp.top.pboundxy = absorb #boundary condition at edge or radial mesh
 
 
 #Create Species of particles to advance
-uranium_beam = Species(type=Uranium,charge_state=+1,name="Beam species",weight=1)
+uranium_beam = wp.Species(type=Uranium,charge_state=+1,name="Beam species",weight=1)
                #weight = 0 no spacecharge, 1 = spacecharge.
                #Both go through Poisson sovler.
 
-top.lbeamcom = False #Specify grid does not move to follow beam center
+wp.top.lbeamcom = False #Specify grid does not move to follow beam center
                      #of mass as appropriate for trap simulation
 
 
@@ -57,17 +57,17 @@ top.lbeamcom = False #Specify grid does not move to follow beam center
 # Generate Code
 ####################################################################
 
-package("w3d") # Specify 3D code.  But fieldsolver will be r-z and particles will deposit on r-z mesh
-generate()     # Initate code, this will also make an initial fieldsolve
+wp.package("w3d") # Specify 3D code.  But fieldsolver will be r-z and particles will deposit on r-z mesh
+wp.generate()     # Initate code, this will also make an initial fieldsolve
 
-solver.ldosolve = True #This sets up the field solver with the beam fields.
+wp.solver.ldosolve = True #This sets up the field solver with the beam fields.
                      #particles are treated as interacting. False, turns off space charge
 
 #Load Parameters
 Np = 1000
 particle_energy = .3570*kV
 
-z = w3d.zmesh
+z = wp.w3d.zmesh
 sigma_list = (.1*mm, .1*mm, 1*mm)               #Standard deviations (sx, sy, sz)
 temp_list = (4*8.62e-5, 4*8.62e-5)                #8.62e-5[eV] = 1 [K]
 pos_dist = 'gaussian'                         #Distribution for position
@@ -88,7 +88,7 @@ initial_bunchlength = max(load_list[:,2]) - min(load_list[:,2])
 value_list = [particle_energy, uranium_beam.mass, \
               Np, temp_list[0], temp_list[1], \
               sigma_list[0], sigma_list[1], sigma_list[2], \
-              top.dt, initial_bunchlength]
+              wp.top.dt, initial_bunchlength]
 
 parameterfile = open("parameters.txt", "w")
 for value in value_list:
@@ -108,7 +108,7 @@ def scrapebeam():
     uranium_beam.gaminv[rsq >= aperture_radius**2] = 0 #does not save particle, set 0 does.
 
 installparticlescraper(scrapebeam)
-top.lsavelostpart = 1 #save lost particles.
+wp.top.lsavelostpart = 1 #save lost particles.
 
 
 
@@ -356,7 +356,7 @@ iteration = 0
 while bounce_count <=4:
 #while iteration < 10:
 
-    step(1)  # advance particles
+    wp.step(1)  # advance particles
     sign_list = np.sign(tracked_uranium.getvz())
 
     if sign_list[iteration] != sign_list[iteration + 1]:

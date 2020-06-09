@@ -223,5 +223,5 @@ writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800) #Some video se
 #Ani is the actual animations. interval is interval between frames in microseconds. Blit is what speeds up the animation process
 #by only plotting the changes rather then replotting each frame.
 ani = animation.FuncAnimation(fig, animate, frames=num_of_frames-1, interval=200, repeat=True, blit = True) #The actual animator
-ani.save('/Users/nickvalverde/Dropbox/Research/ORISS/Working/Animated_Plots/looking_down_beamline.mp4', writer=writer)
+ani.save('/Users/nickvalverde/Dropbox/Research/ORISS/looking_down_beamline.mp4', writer=writer)
 plt.show()

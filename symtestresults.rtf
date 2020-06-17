@@ -1,0 +1,98 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Full 3D\
+\
+# x-mesh\
+wp.w3d.xmmax =   72*mm # Upper limit of mesh r_max\
+wp.w3d.xmmin =   -72*mm # Lower limit of mesh r_min (should be zero for r-z)\
+wp.w3d.nx    = 288      ### less fine mesh\
+\
+# y-mesh\
+wp.w3d.ymmax =   72*mm# Upper limit of mesh\
+wp.w3d.ymmin =   -72*mm # Lower limit of mesh\
+wp.w3d.ny    =   290 # Mesh points are 0,...,ny\
+\
+# z-mesh\
+wp.w3d.zmmax =   +680.*mm # Upper limit of mesh\
+wp.w3d.zmmin =   -680.*mm # Lower limit of mesh\
+wp.w3d.nz    = 1024   ### less fine\
+\
+Grid spacing in x =  5.0000E-04 m\
+ Grid spacing in y =  5.0000E-04 m\
+ Grid spacing in z =  1.3281E-03 m\
+\
+solver = wp.MRBlock3D() # multi-grid Poisson solver in 2-D r-z geometry\
+\
+\
+Setup time: 153,48 s\
+\
+\
+With L2 Symmetry\
+If the mesh points are kept the same, warp will add resolution to the y-mesh so that it maintains the same shape. \
+In this case, the mesh stayed shape (289,) but ny = .25mm and nx=.5\
+\
+\
+# x-mesh\
+wp.w3d.xmmax =   72*mm # Upper limit of mesh r_max\
+wp.w3d.xmmin =   -72*mm # Lower limit of mesh r_min (should be zero for r-z)\
+wp.w3d.nx    = 288      ### less fine mesh\
+\
+# y-mesh\
+wp.w3d.ymmax =   72*mm# Upper limit of mesh\
+wp.w3d.ymmin =   -72*mm # Lower limit of mesh\
+wp.w3d.ny    =   144 # Mesh points are 0,...,ny. (Difference here)\
+\
+# z-mesh\
+wp.w3d.zmmax =   +680.*mm # Upper limit of mesh\
+wp.w3d.zmmin =   -680.*mm # Lower limit of mesh\
+wp.w3d.nz    = 1024   ### less fine\
+\
+ Grid spacing in x =  5.0000E-04 m\
+ Grid spacing in y =  5.0000E-04 m\
+ Grid spacing in z =  1.3281E-03 m\
+\
+wp.package("w3d") # Specify 3D code.\
+wp.w3d.solvergeom = wp.w3d.XYZgeom\
+\
+wp.w3d.l2symtry = True\
+solver = wp.MRBlock3D() \
+\
+Setup Time: 74.014 s\
+\
+\
+\
+With L4 Symmetry \
+# x-mesh\
+wp.w3d.xmmax =   72*mm # Upper limit of mesh r_max\
+wp.w3d.xmmin =   -72*mm # Lower limit of mesh r_min (should be zero for r-z)\
+wp.w3d.nx    = 144     ### less fine mesh\
+\
+# y-mesh\
+wp.w3d.ymmax =   72*mm# Upper limit of mesh\
+wp.w3d.ymmin =   -72*mm # Lower limit of mesh\
+wp.w3d.ny    =   144 # Mesh points are 0,...,ny\
+\
+# z-mesh\
+wp.w3d.zmmax =   +680.*mm # Upper limit of mesh\
+wp.w3d.zmmin =   -680.*mm # Lower limit of mesh\
+wp.w3d.nz    = 1024   ### less fine\
+\
+ Grid spacing in x =  5.0000E-04 m\
+ Grid spacing in y =  5.0000E-04 m\
+ Grid spacing in z =  1.3281E-03 m\
+\
+\
+wp.package("w3d") # Specify 3D code.\
+wp.w3d.solvergeom = wp.w3d.XYZgeom\
+\
+wp.w3d.l4symtry = True\
+solver = wp.MRBlock3D() \
+\
+Setup Time: 38.885 seconds\
+\
+}

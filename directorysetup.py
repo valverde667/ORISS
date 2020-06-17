@@ -1,22 +1,30 @@
 import os
 
-currentdir = os.getcwd()+'/'
+parent_dir = os.getcwd()
 
 #--Diagnostic plotting
-diagnostics = 'prediagnostics/'
-os.mkdir(currentdir+diagnostics)
+prediagnostics = 'prediagnostics'
+path = os.path.join(parent_dir,prediagnostics)
+os.mkdir(path)
+print("prediagnostics folder created")
 
 #--Outputs
 outputs = 'outputs/'
 
 #datafiles
 data='data'
-os.mkdir(currentdir+outputs+data)
+path = os.path.join(parent_dir,outputs+data)
+os.mkdir(path)
+print("outputs/data folder created")
 
 #animations
 animations = 'animations'
-os.makedir(currentdir+outputs+animations)
+path = os.path.join(parent_dir,outputs+animations)
+os.mkdir(path)
+print("oputs/animations folder created")
 
 #diagnostics
 diagnostics='diagnostics'
-os.mkdir(currentdir+outputs+diagnostics)
+path = os.path.join(parent_dir, outputs+diagnostics)
+os.mkdir(path)
+print("outputs/diagnostics folder created")

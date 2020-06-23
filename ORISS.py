@@ -17,6 +17,7 @@ from warp.particles.singleparticle import TraceParticle
 #--Import user created files
 from Particle_Class import *
 from fill_ellipse import *
+import diagnostics.diagplt as diagnostics 
 
 
 start_time = time.time()
@@ -316,7 +317,7 @@ while phaseplots:
     plt.show()
 
     phaseplots = False
-    
+
 raise Exception()
 
 #--Plot fields with warp

@@ -12,7 +12,7 @@ def fill_position(num_of_particles, sigma, avg_coordinates):
     y = np.random.normal(Y, sigmay)
     z = np.random.normal(Z, sigmaz)
     rperp = np.sqrt(x**2 + y**2)
-    rz = z
+
 
     counter = 0
     position_array = np.zeros([num_of_particles, 3], dtype = float)
@@ -27,7 +27,7 @@ def fill_position(num_of_particles, sigma, avg_coordinates):
         dz = z*(-1 + 2*Uz)
 
         term1 = (dx**2 + dy**2)/rperp**2
-        term2 = dz**2/rz**2
+        term2 = dz**2/z**2
 
         condition = term1 + term2
 
@@ -42,14 +42,13 @@ def fill_position(num_of_particles, sigma, avg_coordinates):
     return position_array
 
 
-def fill_velocity(mass, energy,num_of_particles, avg_velocities, Vz, temperature):
+def fill_velocity(mass, energy, num_of_particles,
+              Vx, Vy, Vz,
+              temp_para, temp_perp):
 
         #Unpack tuples
-
-        Vx, Vy = avg_velocities[0], avg_velocities[1]
         eVtoK = 8.62e-5 #conversion from eV to Kelvin
-        Vz = np.sqrt(2*wp.jperev*energy/mass)
-        temp_para, temp_perp = temperature[0]*eVtoK, temperature[1]*eVtoK #convert to K
+        temp_para, temp_perp = temp_para*eVtoK, temp_perp*eVtoK #convert to K
         vperp = np.sqrt(5*wp.boltzmann*temp_perp/(2*mass))
         vpara = np.sqrt(5*wp.boltzmann*temp_para/mass)
 
@@ -78,7 +77,7 @@ def fill_velocity(mass, energy,num_of_particles, avg_velocities, Vz, temperature
             if condition < 1:
                 velocity_array[counter][0] = dvx
                 velocity_array[counter][1] = dvy
-                velocity_array[counter][2] = abs(dvz)
+                velocity_array[counter][2] = dvz
                 counter += 1
             else:
                 pass

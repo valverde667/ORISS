@@ -134,7 +134,8 @@ class MyParticle(object):
         elif velocity_distribution == 'uniform_ellipsoid':
             #Import fill_velocity function from the fill_ellipse module
             from fill_ellipse import fill_velocity
-            velocity_array = fill_velocity(mass, energy, num_of_particles, avg_velocities, Vz, temperature)
+            velocity_array = fill_velocity(mass, energy, num_of_particles,
+            Vx, Vy, Vz, temp_para, temp_perp)
 
             return velocity_array
 

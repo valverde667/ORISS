@@ -11,11 +11,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.animation as animation
+import os
 
 import warp as wp
 
-file_save = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Animations/Real_Dist/'
 
+file_save = os.getcwd()
 #Some useful defintions.
 mm = 1e-3
 ms = 1e-3

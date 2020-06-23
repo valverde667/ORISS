@@ -12,6 +12,7 @@ wp.w3d.xmmin =    0. # Lower limit of mesh r_min (should be zero for r-z)
 #w3d.nx = 2560
 wp.w3d.nx    = 1024      ### less fine mesh
 
+
 # y-mesh (do not define in r-z simulations)
 #w3d.ymmax =   +.1 # Upper limit of mesh
 #w3d.ymmin =   -.1 # Lower limit of mesh

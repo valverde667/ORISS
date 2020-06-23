@@ -29,7 +29,7 @@ Grid spacing in x =  5.0000E-04 m\
 solver = wp.MRBlock3D() # multi-grid Poisson solver in 2-D r-z geometry\
 \
 \
-Setup time: 153,48 s\
+Setup time: 153.48 s\
 \
 \
 With L2 Symmetry\
@@ -93,6 +93,26 @@ wp.w3d.solvergeom = wp.w3d.XYZgeom\
 wp.w3d.l4symtry = True\
 solver = wp.MRBlock3D() \
 \
-Setup Time: 38.885 seconds\
+Setup Time: 38.885 s\
+\
+\
+Using RZ Symmetry:\
+# x-mesh \
+wp.w3d.xmmax =   72.*mm \
+wp.w3d.xmmin =    0. \
+wp.w3d.nx = 144\
+\
+\
+# z-mesh\
+wp.w3d.zmmax =   +680.*mm # Upper limit of mesh\
+wp.w3d.zmmin =   -680.*mm # Lower limit of mesh\
+wp.w3d.nz    = 1024   ### less fine\
+\
+Grid spacing in x =  5.0000E-04 m\
+Grid spacing in y =  5.0000E-04 m\
+Grid spacing in z =  1.3281E-03 m\
+\
+Setup Time: 0.171 s\
+\
 \
 }

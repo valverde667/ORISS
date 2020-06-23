@@ -59,29 +59,33 @@ wp.top.lbeamcom = False #Specify grid does not move to follow beam center
 
 wp.package("w3d") # Specify 3D code.  But fieldsolver will be r-z and particles will deposit on r-z mesh
 wp.generate()     # Initate code, this will also make an initial fieldsolve
-
+print("--- %s seconds ---" % (time.time() - start_time))
 solver.ldosolve = False #False/True turns off/on space-charge
 
 
 #Load Parameters
-Np = 1000
+Np = 3000
 particle_energy = .3570*kV
 
 z = wp.w3d.zmesh
 sigma_list = (.1*mm, .1*mm, 1*mm)               #Standard deviations (sx, sy, sz)
 temp_list = (4*8.62e-5, 4*8.62e-5)                #8.62e-5[eV] = 1 [K]
-pos_dist = 'gaussian'                         #Distribution for position
-vel_dist = 'gaussian'                         #Distribution for velocity
-
-energyspread = [(i*0.005+1)*particle_energy for i in range(-4,6)]
-for energy in energyspread:
-    p = MyParticle(energy, uranium_beam) #Create particle instance
-
-    load_list = p.loader(position_distribution=pos_dist, velocity_distribution=vel_dist, \
-                         num_of_particles=Np, sigma=sigma_list, temperature=temp_list)
-    #Add arrays to beam (x, y, z, vx, vy, vz)
-    uranium_beam.addparticles(load_list[:,0], load_list[:,1], load_list[:,2], \
-                              load_list[:,3], load_list[:,4], load_list[:,5])
+pos_dist = 'uniform_ellipsoid'                         #Distribution for position
+vel_dist = 'uniform_ellipsoid'                         #Distribution for velocity
+p = MyParticle(particle_energy, uranium_beam)
+load_list  = p.loader(position_distribution=pos_dist, velocity_distribution=vel_dist,
+num_of_particles=Np, sigma=sigma_list, temperature=temp_list)
+uranium_beam.addparticles(load_list[:,0], load_list[:,1], load_list[:,2],
+                        load_list[:,3], load_list[:,4], load_list[:,5])
+# energyspread = [(i*0.005+1)*particle_energy for i in range(-4,6)]
+# for energy in energyspread:
+#     p = MyParticle(energy, uranium_beam) #Create particle instance
+#
+#     load_list = p.loader(position_distribution=pos_dist, velocity_distribution=vel_dist, \
+#                          num_of_particles=Np, sigma=sigma_list, temperature=temp_list)
+#     #Add arrays to beam (x, y, z, vx, vy, vz)
+#     uranium_beam.addparticles(load_list[:,0], load_list[:,1], load_list[:,2], \
+#                               load_list[:,3], load_list[:,4], load_list[:,5])
 
 #Write parameters to txt file
 initial_bunchlength = max(load_list[:,2]) - min(load_list[:,2])
@@ -95,7 +99,6 @@ for value in value_list:
     parameterfile.write('{}'.format(value) + "\n")
     parameterfile.flush()
 parameterfile.close()
-
 
 #--Add tracer particle
 tracked_uranium =  wp.Species(type=wp.Uranium,charge_state=+1,name="Beam species",weight=0)
@@ -205,12 +208,12 @@ rpos_list = np.sqrt(xpos_list**2 + ypos_list**2)
 vr_list = np.sqrt(vx_list**2 + vy_list**2)
 
 #Filestring is useful for saving images.
-dist_filestring = '/Users/nickvalverde/Dropbox/Research/ORISS/Runs_Plots/Diagnostics/Distribution/'
+dist_filestring = '/Users/nickvalverde/Dropbox/Research/ORISS'
 
 #-- Create figure for each dist plot and plot.
 #  It is import to create a separate figure for each or else data will mix into
 #  other plots.
-phaseplots = False
+phaseplots = True
 while phaseplots:
     xzplot = plt.figure(1)
     plt.scatter(zpos_list/mm,xpos_list/mm, s = .5)
@@ -313,6 +316,8 @@ while phaseplots:
     plt.show()
 
     phaseplots = False
+    
+raise Exception()
 
 #--Plot fields with warp
 # winon() #Turn on window graphic
@@ -353,7 +358,7 @@ trackedfile.write('{},{},{},{},{},{},{},{}'.format(0, tracked_uranium.getz()[0],
 
 bounce_count = 0
 iteration = 0
-while bounce_count <=1:
+while bounce_count <=2:
 #while iteration < 10:
 
     wp.step(1)  # advance particles

@@ -17,7 +17,7 @@ from warp.particles.singleparticle import TraceParticle
 #--Import user created files
 from Particle_Class import *
 from fill_ellipse import *
-import diagnostics.diagplt as diagnostics 
+import diagnostics.diagplt as diagnostics
 
 
 start_time = time.time()
@@ -197,17 +197,6 @@ field_diagnostic_file_string = ('/Users/nickvalverde/Dropbox/Research/ORISS/Runs
 #
 
 
-
-#-- Create Distribution Plots
-xpos_list = load_list[:,0]
-vx_list = load_list[:,3]
-ypos_list = load_list[:,1]
-vy_list = load_list[:,4]
-zpos_list = load_list[:,2]
-vz_list = load_list[:,5]
-rpos_list = np.sqrt(xpos_list**2 + ypos_list**2)
-vr_list = np.sqrt(vx_list**2 + vy_list**2)
-
 #Filestring is useful for saving images.
 dist_filestring = '/Users/nickvalverde/Dropbox/Research/ORISS'
 
@@ -216,105 +205,49 @@ dist_filestring = '/Users/nickvalverde/Dropbox/Research/ORISS'
 #  other plots.
 phaseplots = True
 while phaseplots:
-    xzplot = plt.figure(1)
-    plt.scatter(zpos_list/mm,xpos_list/mm, s = .5)
-    plt.title('x-z', fontsize = 16)
-    plt.xlabel("z[mm]", fontsize = 14)
-    plt.ylabel("x[mm]", fontsize = 14)
+    fig,axes = plt.subplots(nrows=2, ncols=3)
+    #--top row: position distributions
+    #Bottom row: velocity distributions
+
+    #Set position axes
+    xzax = diagnostics.xzscatplot(axes[0,0], uranium_beam)
+    yzax = diagnostics.yzscatplot(axes[0,1], uranium_beam)
+    xyax = diagnostics.xyscatplot(axes[0,2], uranium_beam)
+
+
+    #Set velocity axes
+    vxvzax = diagnostics.vxvzscatplot(axes[1,0], uranium_beam)
+    vyvzax = diagnostics.vyvzscatplot(axes[1,1], uranium_beam)
+    vxvyax = diagnostics.vxvyscatplot(axes[1,2], uranium_beam)
+
+    #Add Global title
     plt.tight_layout()
-    plt.savefig(dist_filestring + 'x-z.png', dpi=300)
-
-
-    yzplot = plt.figure(2)
-    plt.scatter(zpos_list/mm,ypos_list/mm, s = .5)
-    plt.title('y-z', fontsize = 16)
-    plt.xlabel("z[mm]", fontsize = 14)
-    plt.ylabel("y[mm]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'y-z.png', dpi=300)
-
-
-    xyplot = plt.figure(3)
-    plt.scatter(xpos_list/mm, ypos_list/mm, s = .5)
-    plt.title('x-y', fontsize = 16)
-    plt.xlabel("x[mm]", fontsize = 14)
-    plt.ylabel("y[mm]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'y-x.png', dpi=300)
-
-
-    rzplot = plt.figure(4)
-    plt.scatter(zpos_list/mm, rpos_list/mm, c = 'b', s = .5)
-    plt.title('r-z', fontsize = 16)
-    plt.xlabel("z[mm]", fontsize = 14)
-    plt.ylabel("r[mm]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'r-z.png', dpi=300)
-
-
-    vxxplot = plt.figure(5)
-    plt.scatter(xpos_list/mm, vx_list, s = .5)
-    plt.title('vx-x', fontsize = 16)
-    plt.xlabel("x [m]", fontsize = 14)
-    plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'vx-x.png', dpi=300)
-
-
-    vyyplot = plt.figure(6)
-    plt.scatter(ypos_list/mm, vy_list, s = .5)
-    plt.title('vy-y', fontsize = 16)
-    plt.xlabel("y[mm]", fontsize = 14)
-    plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'vy-y.png', dpi=300)
-
-
-    vzzplot = plt.figure(7)
-    plt.scatter(zpos_list/mm, vz_list, s = .5)
-    plt.title('vz-z', fontsize = 16)
-    plt.xlabel("z[mm]", fontsize = 14)
-    plt.ylabel(r"$v_z$[m/s]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'vz-z.png', dpi=300)
-
-    vrzplot = plt.figure(8)
-    plt.scatter(zpos_list/mm, vr_list, s = .5)
-    plt.title('vr-z', fontsize = 16)
-    plt.xlabel("z[mm]", fontsize = 14)
-    plt.ylabel(r"$v_r$[m/s]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'vr-z.png', dpi=300)
-
-
-    vzvxplot = plt.figure(9)
-    plt.scatter(vz_list, vx_list, s = .5)
-    plt.title('vx-vz', fontsize = 16)
-    plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
-    plt.ylabel(r"$v_x$[m/s]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'vx-vz.png', dpi=300)
-
-
-
-
-    vzvyplot = plt.figure(10)
-    plt.scatter(vz_list, vy_list, s = .5)
-    plt.title('vy-vz', fontsize = 16)
-    plt.xlabel(r"$v_z$[m/s]", fontsize = 14)
-    plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'vy-vz.png', dpi=300)
-
-
-    vxvyplot = plt.figure(11)
-    plt.scatter(vx_list, vy_list, s = .5)
-    plt.title('vy-vx', fontsize = 16)
-    plt.xlabel(r"$v_x$[m/s]", fontsize = 14)
-    plt.ylabel(r"$v_y$[m/s]", fontsize = 14)
-    plt.tight_layout()
-    plt.savefig(dist_filestring + 'vy-vx.png', dpi=300)
     plt.show()
+
+    fig, axes = plt.subplots(nrows=1, ncols=3)
+    #--phase-space plots
+    vxxax = diagnostics.vxxscatplot(axes[0], uranium_beam)
+    vyyax = diagnostics.vyyscatplot(axes[1], uranium_beam)
+    vzzax = diagnostics.vzzscatplot(axes[2], uranium_beam)
+
+    plt.tight_layout()
+    plt.show()
+
+    # rzplot = plt.figure(4)
+    # plt.scatter(zpos_list/mm, rpos_list/mm, c = 'b', s = .5)
+    # plt.title('r-z', fontsize = 16)
+    # plt.xlabel("z[mm]", fontsize = 14)
+    # plt.ylabel("r[mm]", fontsize = 14)
+    # plt.tight_layout()
+    # plt.show()
+    #
+    # vrzplot = plt.figure(8)
+    # plt.scatter(zpos_list/mm, vr_list, s = .5)
+    # plt.title('vr-z', fontsize = 16)
+    # plt.xlabel("z[mm]", fontsize = 14)
+    # plt.ylabel(r"$v_r$[m/s]", fontsize = 14)
+    # plt.tight_layout()
+    # plt.show()
 
     phaseplots = False
 

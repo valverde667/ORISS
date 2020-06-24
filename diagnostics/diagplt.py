@@ -7,7 +7,8 @@ import warp as wp
 
 
 
-def xzscatplot(beam,
+def xzscatplot(ax,
+    beam,
     scale = wp.mm,
     markersize=.1,
     color = 'k',
@@ -21,15 +22,16 @@ def xzscatplot(beam,
     x = beam.getx()/scale
     z = beam.getz()/scale
 
-    fig, ax = plt.subplots()
-    ax.scatter(z,x, s=markersize, c=color)
+    ax.scatter(z, x, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
 
+
     return ax
 
-def xyscatplot(beam,
+def xyscatplot(ax,
+    beam,
     scale = wp.mm,
     markersize=.1,
     color = 'k',
@@ -43,15 +45,16 @@ def xyscatplot(beam,
     x = beam.getx()/scale
     y = beam.gety()/scale
 
-    fig, ax = plt.subplots()
-    ax.scatter(y,x, s=markersize, c=color)
+    ax.scatter(y, x, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
 
+
     return ax
 
-def yzscatplot(beam,
+def yzscatplot(ax,
+    beam,
     scale = wp.mm,
     markersize=.1,
     color = 'k',
@@ -65,15 +68,15 @@ def yzscatplot(beam,
     z = beam.getz()/scale
     y = beam.gety()/scale
 
-    fig, ax = plt.subplots()
-    ax.scatter(z,y, s=markersize, c=color)
+    ax.scatter(z, y, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
 
     return ax
 
-def vxxscatplot(beam,
+def vxxscatplot(ax,
+    beam,
     scale = wp.mm,
     velscale = 1,
     markersize=.1,
@@ -88,38 +91,15 @@ def vxxscatplot(beam,
     vx = beam.getvx()/velscale
     x = beam.getx()/scale
 
-    fig, ax = plt.subplots()
-    ax.scatter(x,vx, s=markersize, c=color)
+    ax.scatter(x, vx, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
 
     return ax
 
-def vxxscatplot(beam,
-    scale = wp.mm,
-    velscale = 1,
-    markersize=.1,
-    color = 'k',
-    title = r"$v_x$ vs x",
-    titlesize = 16,
-    axlblsize = 14,
-    xlabel = "x [mm]",
-    ylabel = r"$v_x$[m/s]",
-    ):
-
-    vx = beam.getvx()/velscale
-    x = beam.getx()/scale
-
-    fig, ax = plt.subplots()
-    ax.scatter(y,x, s=markersize, c=color)
-    ax.set_title(title, fontsize=titlesize)
-    ax.set_xlabel(xlabel, fontsize=axlblsize)
-    ax.set_ylabel(ylabel, fontsize=axlblsize)
-
-    return ax
-
-def vyyscatplot(beam,
+def vyyscatplot(ax,
+    beam,
     scale = wp.mm,
     velscale = 1,
     markersize=.1,
@@ -134,15 +114,15 @@ def vyyscatplot(beam,
     vy = beam.getvy()/velscale
     y = beam.gety()/scale
 
-    fig, ax = plt.subplots()
-    ax.scatter(y,vy, s=markersize, c=color)
+    ax.scatter(y, vy, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
 
     return ax
 
-def vzzscatplot(beam,
+def vzzscatplot(ax,
+    beam,
     scale = wp.mm,
     velscale = 1,
     markersize = .1,
@@ -157,8 +137,7 @@ def vzzscatplot(beam,
     vz = beam.getvz()/velscale
     z = beam.getz()/scale
 
-    fig, ax = plt.subplots()
-    ax.scatter(z,vz, s=markersize, c=color)
+    ax.scatter(z, vz, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
@@ -166,7 +145,8 @@ def vzzscatplot(beam,
     return ax
 
 
-def vxvyscatplot(beam,
+def vxvyscatplot(ax,
+    beam,
     velscale = 1,
     markersize=.1,
     color = 'k',
@@ -180,15 +160,15 @@ def vxvyscatplot(beam,
     vx = beam.getvx()/velscale
     vy = beam.getvy()/velscale
 
-    fig, ax = plt.subplots()
-    ax.scatter(vx,vy, s=markersize, c=color)
+    ax.scatter(vx, vy, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
 
     return ax
 
-def vxvzscatplot(beam,
+def vxvzscatplot(ax,
+    beam,
     velscale = 1,
     markersize=.1,
     color = 'k',
@@ -202,15 +182,15 @@ def vxvzscatplot(beam,
     vx = beam.getvx()/velscale
     vz = beam.getvz()/velscale
 
-    fig, ax = plt.subplots()
-    ax.scatter(vz,vx, s=markersize, c=color)
+    ax.scatter(vz, vx, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)
 
     return ax
 
-def vyvzscatplot(beam,
+def vyvzscatplot(ax,
+    beam,
     velscale = 1,
     markersize=.1,
     color = 'k',
@@ -224,8 +204,7 @@ def vyvzscatplot(beam,
     vy = beam.getvy()/velscale
     vz = beam.getvz()/velscale
 
-    fig, ax = plt.subplots()
-    ax.scatter(vz,vy, s=markersize, c=color)
+    ax.scatter(vz, vy, s=markersize, c=color)
     ax.set_title(title, fontsize=titlesize)
     ax.set_xlabel(xlabel, fontsize=axlblsize)
     ax.set_ylabel(ylabel, fontsize=axlblsize)

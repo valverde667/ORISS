@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d, Axes3D
 from matplotlib import cm
 import numpy as np
+import scipy.integrate as integrate
 import time
 
 #--Import Warp Packages and modules
@@ -37,13 +38,15 @@ wp.package("w3d") # Specify 3D code.  But fieldsolver will be r-z and particles 
 wp.generate()     # Initate code, this will also make an initial fieldsolve
 
 
+zeroindex = np.where(wp.w3d.zmesh==0)[0][0]
+z = wp.w3d.zmesh[zeroindex:]
+phiz = wp.getphi(ix=0, iy=0)[zeroindex:]
+maxindex = np.where(phiz==max(phiz))[0][0]
 
+particle_energy =  0.98*max(phiz)*wp.jperev
 
-phiz = wp.getphi(ix=0, iy=0)
-particle_energy =  max(phiz)*wp.jperev
-
-dphi = np.gradient(phiz, wp.w3d.dz)
-ddphi = np.gradient(dphi, wp.w3d.dz)
+dphi = np.gradient(phiz, z)
+ddphi = np.gradient(dphi, z)
 
 integralconst = -e/(4*particle_energy)
 
@@ -51,13 +54,21 @@ x = e*phiz/particle_energy
 xx = x**2
 xxx = x*x*x
 
-
 integrand = integralconst*ddphi*(1 + x + xx + xxx)
 
-fig,ax = plt.subplots()
-ax.setxlabel('z [m]')
-ax.setylabel('Integrand [1/m]')
-ax.plot(wp.w3d.zmesh, integrand)
+fig,axes = plt.subplots(nrows=2, ncols=1, sharex=True)
+phiplot, integrandplot = axes[0], axes[1]
+phiplot.plot(z, phiz)
+phiplot.axvline(x=z[maxindex], c='k', ls='--', lw=.5)
+phiplot.set_ylabel('Potential [kV]')
+
+integrandplot.plot(z,integrand)
+integrandplot.axvline(x=z[maxindex], c='k', ls='--', lw=.5)
+integrandplot.set_xlabel('z [m]')
+integrandplot.set_ylabel(r'Integrand [1/m$^2$]')
+
+I = integrate.simps(integrand)
+focalpoint = 1/I
+print("Focal Point at %f [m] " %focalpoint)
+plt.tight_layout()
 plt.show()
-
-

@@ -241,7 +241,7 @@ I_const = -e/(2*particle_energy)
 
 #Partition integral formula for easier evaluation
 numerator = ddphi[:jmax]
-denom = np.sqrt(1-e*phi[:jamx]/(particle_energy))
+denom = np.sqrt(1-e*phi[:jmax]/(particle_energy))
 #Evaluate integrand
 integrand = numerator/denom
 #Evaluate integral
@@ -276,23 +276,16 @@ upperlimit_den = e*(phi[jmax+1] - phi[jmax])
 upperlimit = np.sqrt(1 - upperlimit_num/upperlimit_den)
 u = np.linspace(1, upperlimit, 100)
 
-integrand_t = 1
+inegrand_t = 1 #Constant after u-sub
+#evaluate integral It
+It = C_t*(upperlimit-1)
 
-print(const_t)
-fig,ax = plt.subplots()
-ax.plot(u, integrandt_t)
-ax.set_xlabel('u')
-ax.set_ylabel('Integrand')
-ax.set_title("Integral near turning point")
-plt.tight_layout()
-plt.show()
+#Evalate focal length
+finv = I_const*(I1 + It)
+f = 1/finv
 
-
+print("f = ", f)
 raise Exception()
-
-
-
-
 #--Visulization--
 #--Visualize turning point
 potential_energy = e*phi

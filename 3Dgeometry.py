@@ -1,4 +1,3 @@
-wp.setup()  # setup graphics etc.
 mm = wp.mm
 kV = wp.kV
 ####################################################################
@@ -37,7 +36,7 @@ wp.w3d.boundxy = wp.dirichlet #in all transverse directions
 
 wp.f3d.mgmaxiters = 1000 #  Max iterations of multigrid field solve
 wp.w3d.l4symtry = True  # True
-solver = wp.MRBlock3D() # multi-grid Poisson solver in 2-D r-z geometry
+solver = wp.MRBlock3D() 
 solver.mgverbose = +1 #cannot find what these settings do.
 solver.mgtol = 1.e-4  # Absolute tolerance (convergance) of field solver in potential [Volts]
 wp.registersolver(solver)

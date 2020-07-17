@@ -230,7 +230,7 @@ particle_energy = 0.357*kV*wp.jperev
 #Set index for maximum phi
 maxphi_index = np.where(phi == max(phi))[0][0]
 #Find and set grid point jmax just before turning point zt
-jmax = np.where(e*phi > particle_energy)[0][0]-1 #Minus 1 to move back one cell
+jmax = np.where(e*phi > particle_energy)[0][0] - 1 #Minus 1 to move back one grdpt
 
 #Evaluate first and second derivatives of potential along z
 dphi = np.gradient(phi, z)
@@ -239,15 +239,16 @@ ddphi = np.gradient(dphi, z)
 #Evaluate the constant in the integral formula
 I_const = -e/(2*particle_energy)
 
+#--Numeric integration up to jmax
 #Partition integral formula for easier evaluation
-numerator = ddphi[:jmax]
-denom = np.sqrt(1-e*phi[:jmax]/(particle_energy))
+numerator = ddphi[:jmax+1]
+denom = np.sqrt(1 - e*phi[:jmax+1]/particle_energy)
 #Evaluate integrand
 integrand = numerator/denom
 #Evaluate integral
-I1 = integrate.simps(integrand) #integral up to max z (before turning point)
+I1 = integrate.simps(integrand)
 
-#--Compute portion of integral at turning point It
+#--Compute portion of integral from jmax to turning point zt
 dz = wp.w3d.dz #grid spacing
 
 #Evalute constants
@@ -260,9 +261,9 @@ a = anum/aden * e*phi[jmax]/dz
 C_t1 = np.sqrt( particle_energy / (particle_energy-e*phi[jmax]) )
 C_t2 = (phi[jmax+1] - 2*phi[jmax] - phi[jmax-1]) / (dz*dz)
 
+#Evaluate overall constant on It
 C_t = -C_t1*C_t2*2/a
 
-#--Visualize integrand
 #evaluate zt
 ztnum = particle_energy - e*phi[jmax]
 ztden = e*(phi[jmax+1] - phi[jmax])
@@ -274,9 +275,11 @@ upperlimit_num = particle_energy - e*phi[jmax]
 upperlimit_den = e*(phi[jmax+1] - phi[jmax])
 
 upperlimit = np.sqrt(1 - upperlimit_num/upperlimit_den)
-u = np.linspace(1, upperlimit, 100)
 
+#Evaluate It
+u = np.linspace(1, upperlimit, 100)
 inegrand_t = 1 #Constant after u-sub
+
 #evaluate integral It
 It = C_t*(upperlimit-1)
 
@@ -285,7 +288,7 @@ finv = I_const*(I1 + It)
 f = 1/finv
 
 print("f = ", f)
-raise Exception()
+
 #--Visulization--
 #--Visualize turning point
 potential_energy = e*phi
@@ -293,11 +296,11 @@ potential_energy = e*phi
 fig,ax = plt.subplots()
 ax.set_xlabel('z [mm]')
 ax.set_ylabel('Energy [J]')
-ax.set_ylim(.99*potential_energy[jmax-1], 1.01*potential_energy[jmax+1])
-ax.scatter(z[jmax-1:jmax+1]/mm,
-        potential_energy[jmax-1:jmax+1],
+ax.set_ylim(.99*potential_energy[jmax-1], 1.01*potential_energy[jmax+2])
+ax.scatter(z[jmax-1:jmax+2]/mm,
+        potential_energy[jmax-1:jmax+2],
         c='b', s=8, label='Potential Energy [J]')
-for zpoint in z[jmax-1:jmax+1]:
+for zpoint in z[jmax-1:jmax+2]:
     ax.axvline(x=zpoint/mm, ls='--', lw=.5, c='k')
 ax.axhline(y=particle_energy, ls='--',lw=.5, c='r', label='particle energy')
 plt.legend()
@@ -312,10 +315,10 @@ phiplot, integrandplot = axes[0], axes[1]
 
 #Plot Potential
 phiplot.plot(z, phi/kV, lw=.8)
-phiplot.fill_between(z[:jmax],0, phi[:jmax]/kV,
+phiplot.fill_between(z[:jmax+1],0, phi[:jmax+1]/kV,
                      alpha=0.3, color='green' )
 
-phiplot.axvline(x=z[max_index], c='k', ls='--', lw=.5)
+phiplot.axvline(x=z[jmax], c='k', ls='--', lw=.5)
 phiplot.axhline(y=particle_energy/wp.jperev/kV, c='r', ls='--', lw=.5, label='Particle Energy [eV]')
 phiplot.axhline(y=0, c='k', lw=.5)
 
@@ -324,20 +327,19 @@ phiplot.set_ylabel('Potential [kV]')
 
 #Plot Integrand
 #Mark negative and positive region
-neg_i = np.where(integrand<0)[0][0]
-neg_f = np.where(integrand<0)[0][-1]
-pos_i = np.where(integrand>0)[0][0]
-pos_f = np.where(integrand>0)[0][-1]
+neg_i = np.where(I_const*integrand<0)[0][0]
+neg_f = np.where(I_const*integrand<0)[0][-1]
+pos_i = np.where(I_const*integrand>0)[0][0]
+pos_f = np.where(I_const*integrand>0)[0][-1]
 
-integrandplot.plot(z[:jmax], integrand, lw=.8)
-integrandplot.fill_between(z[:jmax], 0, integrand,
+integrandplot.plot(z[:jmax+1], I_const*integrand, lw=.8)
+integrandplot.fill_between(z[:jmax+1], 0, I_const*integrand,
                      alpha=0.3, color='green' )
 
-integrandplot.axvline(x=z[max_index], c='k', ls='--', lw=.5, label="Integrand up to turning point")
 integrandplot.axvline(x=z[neg_i], c='b', ls='--', lw=.5)
 integrandplot.axvline(x=z[neg_f], c='b', ls='--', lw=.5)
 integrandplot.axvline(x=z[pos_i], c='b', ls='--', lw=.5)
-integrandplot.axvline(x=z[pos_f], c='b', ls='--', lw=.5)
+integrandplot.axvline(x=z[pos_f], c='k', ls='--', lw=.5)
 
 
 integrandplot.axhline(y=0, c='k', lw=.5)

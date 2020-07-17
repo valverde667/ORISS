@@ -259,7 +259,7 @@ a = anum/aden * e*phi[jmax]/dz
 
 #evaluate C1 and C2
 C_t1 = np.sqrt( particle_energy / (particle_energy-e*phi[jmax]) )
-C_t2 = (phi[jmax+1] - 2*phi[jmax] - phi[jmax-1]) / (dz*dz)
+C_t2 = (phi[jmax+1] - 2*phi[jmax] + phi[jmax-1]) / (dz*dz)
 
 #Evaluate overall constant on It
 C_t = -C_t1*C_t2*2/a

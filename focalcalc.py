@@ -276,10 +276,6 @@ upperlimit_den = e*(phi[jmax+1] - phi[jmax])
 
 upperlimit = np.sqrt(1 - upperlimit_num/upperlimit_den)
 
-#Evaluate It
-u = np.linspace(1, upperlimit, 100)
-inegrand_t = 1 #Constant after u-sub
-
 #evaluate integral It
 It = C_t*(upperlimit-1)
 

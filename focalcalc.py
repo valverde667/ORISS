@@ -226,6 +226,7 @@ z = wp.w3d.zmesh
 phi = wp.getphi(ix=0, iy=0)
 #Set particle energy to unit Joules
 particle_energy = 0.357*kV*wp.jperev
+potential_energy = e*phi
 
 #Set index for maximum phi
 maxphi_index = np.where(phi == max(phi))[0][0]
@@ -242,7 +243,7 @@ I_const = -e/(2*particle_energy)
 #--Numeric integration up to jmax
 #Partition integral formula for easier evaluation
 numerator = ddphi[:jmax+1]
-denom = np.sqrt(1 - e*phi[:jmax+1]/particle_energy)
+denom = np.sqrt(1 - potential_energy[:jmax+1]/particle_energy)
 #Evaluate integrand
 integrand = numerator/denom
 #Evaluate integral
@@ -254,27 +255,28 @@ dz = wp.w3d.dz #grid spacing
 #Evalute constants
 # 'a' constant
 anum = phi[jmax+1]/phi[jmax] - 1
-aden = 1 - e*phi[jmax]/particle_energy
-a = anum/aden * e*phi[jmax]/dz
+aden = particle_energy/potential_energy[jmax] - 1
+a = (anum/aden)/dz
 
 #evaluate C1 and C2
-C_t1 = np.sqrt( particle_energy / (particle_energy-e*phi[jmax]) )
+C_t1 = np.sqrt( particle_energy / (particle_energy-potential_energy[jmax]) )
 C_t2 = (phi[jmax+1] - 2*phi[jmax] + phi[jmax-1]) / (dz*dz)
 
 #Evaluate overall constant on It
-C_t = -C_t1*C_t2*2/a
+C_t = C_t1 * C_t2 * (-2/a)
 
 #evaluate zt
-ztnum = particle_energy - e*phi[jmax]
-ztden = e*(phi[jmax+1] - phi[jmax])
+ztnum = dz*(particle_energy - potential_energy[jmax])
+ztden = potential_energy[jmax+1] - potential_energy[jmax]
 
-zt = ztnum/ztden + z[jmax]
+zt = (ztnum/ztden) + z[jmax]
 
 #evaluate upper limit on integral
-upperlimit_num = particle_energy - e*phi[jmax]
-upperlimit_den = e*(phi[jmax+1] - phi[jmax])
+if ( abs(1 -a*(zt-z[jmax])) < 1e-6):
+    upperlimit = 0
+else:
+    raise Exception("Upper limit does not evaluate to 0. Check constants")
 
-upperlimit = np.sqrt(1 - upperlimit_num/upperlimit_den)
 
 #evaluate integral It
 It = C_t*(upperlimit-1)
@@ -283,8 +285,9 @@ It = C_t*(upperlimit-1)
 finv = I_const*(I1 + It)
 f = 1/finv
 
-print("f = ", f)
+print("\n" + "f = {} [mm]".format(f/mm) + "\n")
 
+raise Exception()
 #--Visulization--
 #--Visualize turning point
 potential_energy = e*phi

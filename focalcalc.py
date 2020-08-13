@@ -247,7 +247,7 @@ denom = np.sqrt(1 - potential_energy[:jmax+1]/particle_energy)
 #Evaluate integrand
 integrand = numerator/denom
 #Evaluate integral
-I1 = integrate.simps(integrand)
+I1 = integrate.simps(integrand, dx = wp.w3d.dz)
 
 #--Compute portion of integral from jmax to turning point zt
 dz = wp.w3d.dz #grid spacing
@@ -287,7 +287,6 @@ f = 1/finv
 
 print("\n" + "f = {} [mm]".format(f/mm) + "\n")
 
-raise Exception()
 #--Visulization--
 #--Visualize turning point
 potential_energy = e*phi
